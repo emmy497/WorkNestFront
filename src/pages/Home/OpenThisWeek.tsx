@@ -1,0 +1,26 @@
+import React from "react";
+import JobCard from "../../components/JobCard";
+import { mockJobs } from "../../Data/mockJobs";
+// TODO: swap mockJobs for a real fetch (e.g. useEffect + api/jobs.ts) once the backend endpoint exists.
+// Keep the variable named `jobs` so the swap is a one-line change.
+
+const OpenThisWeek = () => {
+  const jobs = mockJobs.slice(0, 6);
+
+  return (
+    <section className="px-4 sm:px-8 md:px-16 lg:px-[100px]">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-[24px]">
+        {jobs.map((job) => (
+          <JobCard
+            key={job.id}
+            job={job}
+            showDescription={false}
+            showSaveButton={false}
+          />
+        ))}
+      </div>
+    </section>
+  );
+};
+
+export default OpenThisWeek;
