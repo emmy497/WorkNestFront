@@ -171,7 +171,7 @@ const SignUp = () => {
           </div>
 
           {/* Google button */}
-          <NavLink
+          <button
             type="button"
             className="flex justify-center items-center gap-[10px] w-full border-[1px] border-[#6D4AFF] h-[46px] px-4 py-[14px] rounded-[100px]"
           >
@@ -183,7 +183,7 @@ const SignUp = () => {
             <div className="font-semibold text-[14px] sm:text-[15px] text-[#6D4AFF] whitespace-nowrap">
               Continue with Google
             </div>
-          </NavLink>
+          </button>
         </div>
 
         {/* Create Account */}

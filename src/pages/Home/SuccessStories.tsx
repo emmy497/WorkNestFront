@@ -1,4 +1,3 @@
-import React from "react";
 import PhotoCard from "../../components/PhotoCard";
 
 const SuccessStories = () => {

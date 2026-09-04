@@ -1,4 +1,3 @@
-import React from "react";
 import JobCard from "../../components/JobCard";
 import { mockJobs } from "../../Data/mockJobs";
 // TODO: swap mockJobs for a real fetch (e.g. useEffect + api/jobs.ts) once the backend endpoint exists.

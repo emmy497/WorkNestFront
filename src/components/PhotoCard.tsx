@@ -1,5 +1,3 @@
-import React from "react";
-
 type PhotoCardProps = {
   src: string;
   name: string;

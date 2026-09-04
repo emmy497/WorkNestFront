@@ -8,7 +8,6 @@ import SkillsInput from "../components/SkillsInput";
 import ProfileProgressCard from "../components/ProfileProgressCard";
 import ProfilePreviewCard from "../components/ProfilePreviewCard";
 import { fetchMyProfile, updateMyProfile, uploadMyCv, type Profile } from "../api/profile";
-import { useAuth } from "../context/AuthContext";
 
 const YEARS_OF_EXPERIENCE_OPTIONS = ["0-1 years", "1-3 years", "3-5 years", "5-10 years", "10+ years"];
 const AVAILABILITY_OPTIONS = ["Immediately", "2 weeks notice", "1 month notice", "Open to discuss"];
@@ -48,7 +47,6 @@ function Pill({
 }
 
 const EditProfile = () => {
-  const { user } = useAuth();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 

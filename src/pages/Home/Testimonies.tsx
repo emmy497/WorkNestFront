@@ -1,4 +1,3 @@
-import React from "react";
 import TestimonialsCard from "../../components/TestimonialsCard";
 
 const testimonials = [

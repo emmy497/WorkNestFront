@@ -1,5 +1,3 @@
-import React from "react";
-
 type TestimonialsCardProps = {
   quote: string;
   name: string;
