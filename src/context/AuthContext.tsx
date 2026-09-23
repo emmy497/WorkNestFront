@@ -9,6 +9,7 @@ import {
   loginRequest,
   registerRequest,
   verifyEmailRequest,
+  googleAuthRequest,
   getMeRequest,
   saveToken,
   getToken,
@@ -38,6 +39,10 @@ type AuthContextType = {
 
   // Confirms the emailed code, and THEN logs you in.
   verifyEmail: (email: string, otp: string) => Promise<void>;
+
+  // Signs up or logs in with Google — Google already verified the email,
+  // so unlike register() this logs you in immediately, no OTP step.
+  loginWithGoogle: (accessToken: string) => Promise<void>;
 
   logout: () => void;
 };
@@ -92,6 +97,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setUser(data.user);
   }
 
+  async function loginWithGoogle(accessToken: string) {
+    const data = await googleAuthRequest(accessToken);
+    saveToken(data.token);
+    setUser(data.user);
+  }
+
   function logout() {
     clearToken();
     setUser(null);
@@ -104,6 +115,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     login,
     register,
     verifyEmail,
+    loginWithGoogle,
     logout,
   };
 

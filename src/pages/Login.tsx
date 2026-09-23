@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { useGoogleLogin } from "@react-oauth/google";
 import AuthLayout from "../Layout/AuthLayout";
 import { useAuth } from "../context/AuthContext";
 import { NeedsVerificationError } from "../api/auth";
@@ -7,7 +8,7 @@ import { toast } from "../lib/toast";
 
 const Login = () => {
   // Grab the login function from our AuthContext.
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
 
   // Lets us send the user to another page after a successful login.
   const navigate = useNavigate();
@@ -22,6 +23,33 @@ const Login = () => {
   const [password, setPassword] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
+  const [googleSubmitting, setGoogleSubmitting] = useState(false);
+
+  // Fires when Google hands back an access token from the popup. Google has
+  // already confirmed the user's identity — we just pass the token on to
+  // our server, which double-checks it before trusting it.
+  const signInWithGoogle = useGoogleLogin({
+    flow: "implicit",
+    onSuccess: async (tokenResponse) => {
+      setGoogleSubmitting(true);
+
+      try {
+        await loginWithGoogle(tokenResponse.access_token);
+        toast.success("Welcome back");
+        navigate("/find-jobs");
+      } catch (err) {
+        toast.error(
+          "Could not sign you in with Google",
+          err instanceof Error ? err.message : undefined
+        );
+      } finally {
+        setGoogleSubmitting(false);
+      }
+    },
+    onError: () => {
+      toast.error("Could not sign you in with Google");
+    },
+  });
 
   // Show the "Password updated" message from the reset flow as a toast.
   // It's in a useEffect so it fires once when the page loads, not on
@@ -141,7 +169,9 @@ const Login = () => {
           {/* Google button */}
           <button
             type="button"
-            className="flex justify-center items-center gap-[10px] w-full border-[1px] border-[#6D4AFF] h-[46px] px-4 py-[14px] rounded-[100px]"
+            onClick={() => signInWithGoogle()}
+            disabled={googleSubmitting}
+            className="flex justify-center items-center gap-[10px] w-full border-[1px] border-[#6D4AFF] h-[46px] px-4 py-[14px] rounded-[100px] disabled:opacity-60"
           >
             <img
               src="/images/Google.png"
@@ -149,7 +179,7 @@ const Login = () => {
               alt=""
             />
             <div className="font-semibold text-[14px] sm:text-[15px] text-[#6D4AFF] whitespace-nowrap">
-              Continue with Google
+              {googleSubmitting ? "Signing in..." : "Continue with Google"}
             </div>
           </button>
         </div>

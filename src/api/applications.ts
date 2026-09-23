@@ -1,7 +1,5 @@
 import type { Application } from "../types/application";
-import { getToken } from "./auth";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+import apiClient, { extractError } from "../lib/apiClient";
 
 // Everything the wizard collects, sent as one request at the end.
 export type ApplicationDraft = {
@@ -27,38 +25,16 @@ export type ApplicationPrefill = Omit<
   "expectedSalary" | "whyThisRole"
 >;
 
-function authHeaders(): HeadersInit {
-  const token = getToken();
-
-  if (!token) {
-    throw new Error("You need to be logged in");
-  }
-
-  return { Authorization: `Bearer ${token}` };
-}
-
-async function readError(response: Response, fallback: string) {
-  try {
-    const data = await response.json();
-    return data.message || fallback;
-  } catch {
-    return fallback;
-  }
-}
-
 // ---------------------------------------------------------------------------
 // GET /api/applications
 // ---------------------------------------------------------------------------
 export async function fetchApplications(): Promise<Application[]> {
-  const response = await fetch(`${API_URL}/applications`, {
-    headers: authHeaders(),
-  });
-
-  if (!response.ok) {
-    throw new Error(await readError(response, "Could not load your applications"));
+  try {
+    const res = await apiClient.get<Application[]>('/applications');
+    return res.data;
+  } catch (err) {
+    throw new Error(extractError(err, 'Could not load your applications'));
   }
-
-  return response.json();
 }
 
 // ---------------------------------------------------------------------------
@@ -68,15 +44,12 @@ export async function fetchApplications(): Promise<Application[]> {
 // wizard arrive already filled in.
 // ---------------------------------------------------------------------------
 export async function fetchApplicationPrefill(): Promise<ApplicationPrefill> {
-  const response = await fetch(`${API_URL}/applications/prefill`, {
-    headers: authHeaders(),
-  });
-
-  if (!response.ok) {
-    throw new Error(await readError(response, "Could not load your details"));
+  try {
+    const res = await apiClient.get<ApplicationPrefill>('/applications/prefill');
+    return res.data;
+  } catch (err) {
+    throw new Error(extractError(err, 'Could not load your details'));
   }
-
-  return response.json();
 }
 
 // ---------------------------------------------------------------------------
@@ -88,15 +61,12 @@ export async function fetchApplicationPrefill(): Promise<ApplicationPrefill> {
 export async function checkAlreadyApplied(
   jobId: string
 ): Promise<{ applied: boolean; applicationId: string | null }> {
-  const response = await fetch(`${API_URL}/applications/job/${jobId}`, {
-    headers: authHeaders(),
-  });
-
-  if (!response.ok) {
-    throw new Error(await readError(response, "Could not check that role"));
+  try {
+    const res = await apiClient.get<{ applied: boolean; applicationId: string | null }>(`/applications/job/${jobId}`);
+    return res.data;
+  } catch (err) {
+    throw new Error(extractError(err, 'Could not check that role'));
   }
-
-  return response.json();
 }
 
 // ---------------------------------------------------------------------------
@@ -106,20 +76,10 @@ export async function submitApplication(
   jobId: string,
   draft: ApplicationDraft
 ): Promise<{ applicationId: string }> {
-  const response = await fetch(`${API_URL}/applications/${jobId}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...authHeaders(),
-    },
-    body: JSON.stringify(draft),
-  });
-
-  if (!response.ok) {
-    throw new Error(
-      await readError(response, "Could not submit your application")
-    );
+  try {
+    const res = await apiClient.post(`/applications/${jobId}`, draft);
+    return res.data;
+  } catch (err) {
+    throw new Error(extractError(err, 'Could not submit your application'));
   }
-
-  return response.json();
 }

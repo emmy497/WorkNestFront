@@ -2,13 +2,14 @@ import AuthLayout from "../Layout/AuthLayout";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState, type FormEvent } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import { useGoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "../lib/toast";
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
 
-  const { register } = useAuth();
+  const { register, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
 
   // One piece of state per field.
@@ -17,6 +18,32 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [googleSubmitting, setGoogleSubmitting] = useState(false);
+
+  // Google already verifies the email, so unlike the form above this logs
+  // the user straight in — no "check your inbox for a code" step.
+  const signUpWithGoogle = useGoogleLogin({
+    flow: "implicit",
+    onSuccess: async (tokenResponse) => {
+      setGoogleSubmitting(true);
+
+      try {
+        await loginWithGoogle(tokenResponse.access_token);
+        toast.success("Welcome to WorkNest");
+        navigate("/find-jobs");
+      } catch (err) {
+        toast.error(
+          "Could not sign you up with Google",
+          err instanceof Error ? err.message : undefined
+        );
+      } finally {
+        setGoogleSubmitting(false);
+      }
+    },
+    onError: () => {
+      toast.error("Could not sign you up with Google");
+    },
+  });
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -173,7 +200,9 @@ const SignUp = () => {
           {/* Google button */}
           <button
             type="button"
-            className="flex justify-center items-center gap-[10px] w-full border-[1px] border-[#6D4AFF] h-[46px] px-4 py-[14px] rounded-[100px]"
+            onClick={() => signUpWithGoogle()}
+            disabled={googleSubmitting}
+            className="flex justify-center items-center gap-[10px] w-full border-[1px] border-[#6D4AFF] h-[46px] px-4 py-[14px] rounded-[100px] disabled:opacity-60"
           >
             <img
               src="/images/Google.png"
@@ -181,7 +210,7 @@ const SignUp = () => {
               alt=""
             />
             <div className="font-semibold text-[14px] sm:text-[15px] text-[#6D4AFF] whitespace-nowrap">
-              Continue with Google
+              {googleSubmitting ? "Signing in..." : "Continue with Google"}
             </div>
           </button>
         </div>

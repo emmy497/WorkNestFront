@@ -1,4 +1,5 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+import apiClient, { extractError } from "../lib/apiClient";
+
 
 // The shape of a user as the API sends it back.
 export type User = {
@@ -64,27 +65,9 @@ export function clearToken() {
 }
 
 // ---------------------------------------------------------------------------
-// A small helper that reads the error message the server sent.
-//
-// Our API replies with { message: "..." } when something goes wrong, and we
-// want to show that exact text to the user rather than a generic error.
-// ---------------------------------------------------------------------------
-async function readError(response: Response, fallback: string): Promise<string> {
-  try {
-    const data = await response.json();
-    return data.message || fallback;
-  } catch {
-    return fallback;
-  }
-}
-
 // A tiny helper, since every request below is the same POST shape.
 async function post(path: string, body: object) {
-  return fetch(`${API_URL}${path}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+  return apiClient.post(path, body);
 }
 
 // ---------------------------------------------------------------------------
@@ -97,13 +80,12 @@ export async function registerRequest(
   email: string,
   password: string
 ): Promise<RegisterResponse> {
-  const response = await post("/auth/register", { name, email, password });
-
-  if (!response.ok) {
-    throw new Error(await readError(response, "Could not create your account"));
+  try {
+    const res = await post("/auth/register", { name, email, password });
+    return res.data;
+  } catch (err) {
+    throw new Error(extractError(err, "Could not create your account"));
   }
-
-  return response.json();
 }
 
 // ---------------------------------------------------------------------------
@@ -115,26 +97,24 @@ export async function verifyEmailRequest(
   email: string,
   otp: string
 ): Promise<AuthResponse> {
-  const response = await post("/auth/verify-email", { email, otp });
-
-  if (!response.ok) {
-    throw new Error(await readError(response, "Could not verify that code"));
+  try {
+    const res = await post("/auth/verify-email", { email, otp });
+    return res.data;
+  } catch (err) {
+    throw new Error(extractError(err, "Could not verify that code"));
   }
-
-  return response.json();
 }
 
 // ---------------------------------------------------------------------------
 // POST /api/auth/resend-otp
 // ---------------------------------------------------------------------------
 export async function resendOtpRequest(email: string): Promise<MessageResponse> {
-  const response = await post("/auth/resend-otp", { email });
-
-  if (!response.ok) {
-    throw new Error(await readError(response, "Could not resend the code"));
+  try {
+    const res = await post("/auth/resend-otp", { email });
+    return res.data;
+  } catch (err) {
+    throw new Error(extractError(err, "Could not resend the code"));
   }
-
-  return response.json();
 }
 
 // ---------------------------------------------------------------------------
@@ -144,25 +124,36 @@ export async function loginRequest(
   email: string,
   password: string
 ): Promise<AuthResponse> {
-  const response = await post("/auth/login", { email, password });
-
-  if (!response.ok) {
-    const data = await response.json().catch(() => ({}));
-
-    // 403 with needsVerification means: your password was right, but you
-    // never confirmed your email. We throw a special error so the login page
-    // can send them to the verify screen instead of just showing a message.
-    if (response.status === 403 && data.needsVerification) {
+  try {
+    const res = await post("/auth/login", { email, password });
+    return res.data;
+  } catch (err) {
+    const e = err as any;
+    if (e?.response?.status === 403 && e?.response?.data?.needsVerification) {
       throw new NeedsVerificationError(
-        data.message || "Please verify your email first",
-        data.email || email
+        e.response.data.message || "Please verify your email first",
+        e.response.data.email || email
       );
     }
 
-    throw new Error(data.message || "Could not log you in");
+    throw new Error(extractError(err, "Could not log you in"));
   }
+}
 
-  return response.json();
+// ---------------------------------------------------------------------------
+// POST /api/auth/google
+//
+// `accessToken` comes from Google's own popup (via useGoogleLogin), not
+// from anything the user typed. The server checks it against Google before
+// trusting it — see the note in the backend controller.
+// ---------------------------------------------------------------------------
+export async function googleAuthRequest(accessToken: string): Promise<AuthResponse> {
+  try {
+    const res = await post("/auth/google", { accessToken });
+    return res.data;
+  } catch (err) {
+    throw new Error(extractError(err, "Could not sign you in with Google"));
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -174,13 +165,12 @@ export async function loginRequest(
 export async function forgotPasswordRequest(
   email: string
 ): Promise<MessageResponse> {
-  const response = await post("/auth/forgot-password", { email });
-
-  if (!response.ok) {
-    throw new Error(await readError(response, "Could not send the code"));
+  try {
+    const res = await post("/auth/forgot-password", { email });
+    return res.data;
+  } catch (err) {
+    throw new Error(extractError(err, "Could not send the code"));
   }
-
-  return response.json();
 }
 
 // ---------------------------------------------------------------------------
@@ -193,13 +183,12 @@ export async function verifyResetOtpRequest(
   email: string,
   otp: string
 ): Promise<MessageResponse> {
-  const response = await post("/auth/verify-reset-otp", { email, otp });
-
-  if (!response.ok) {
-    throw new Error(await readError(response, "Could not verify that code"));
+  try {
+    const res = await post("/auth/verify-reset-otp", { email, otp });
+    return res.data;
+  } catch (err) {
+    throw new Error(extractError(err, "Could not verify that code"));
   }
-
-  return response.json();
 }
 
 // ---------------------------------------------------------------------------
@@ -210,17 +199,12 @@ export async function resetPasswordRequest(
   otp: string,
   newPassword: string
 ): Promise<MessageResponse> {
-  const response = await post("/auth/reset-password", {
-    email,
-    otp,
-    newPassword,
-  });
-
-  if (!response.ok) {
-    throw new Error(await readError(response, "Could not reset your password"));
+  try {
+    const res = await post("/auth/reset-password", { email, otp, newPassword });
+    return res.data;
+  } catch (err) {
+    throw new Error(extractError(err, "Could not reset your password"));
   }
-
-  return response.json();
 }
 
 // ---------------------------------------------------------------------------
@@ -230,13 +214,12 @@ export async function resetPasswordRequest(
 // Notice the Authorization header — that is the token being sent back.
 // ---------------------------------------------------------------------------
 export async function getMeRequest(token: string): Promise<{ user: User }> {
-  const response = await fetch(`${API_URL}/auth/me`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  if (!response.ok) {
-    throw new Error("Session expired");
+  try {
+    const res = await apiClient.get<{ user: User }>("/auth/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return res.data;
+  } catch (err) {
+    throw new Error(extractError(err, "Session expired"));
   }
-
-  return response.json();
 }

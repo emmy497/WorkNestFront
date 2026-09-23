@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router";
+import { Navigate, Route, Routes } from "react-router";
 import "./App.css";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -11,6 +11,9 @@ import Apply from "./pages/Apply";
 import ViewProfile from "./pages/ViewProfile";
 import EditProfile from "./pages/EditProfile";
 import Applications from "./pages/Applications";
+import AdminLayout from "./pages/Admin/AdminLayout";
+import AdminOverview from "./pages/Admin/Overview";
+import Pipeline from "./pages/Admin/Pipeline";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ScrollToTop from "./components/ScrollToTop";
 
@@ -58,6 +61,29 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* The dashboard lives at /admin. This is just a friendly alias so
+            /dashboard doesn't land on a blank page. */}
+        <Route path="/dashboard" element={<Navigate to="/admin" replace />} />
+
+        {/* The admin dashboard. allowedRoles means a logged-in CANDIDATE
+            gets bounced home — being signed in isn't enough here. The real
+            guard is authorize() on the server; this just matches it. */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute allowedRoles={["admin", "recruiter"]}>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<AdminOverview />} />
+          {/* Both routes render the same Pipeline component — the review
+              screen is a slide-over inside it, not a separate page, so the
+              list underneath must never unmount when :id shows up. */}
+          <Route path="pipeline" element={<Pipeline />} />
+          <Route path="pipeline/:id" element={<Pipeline />} />
+        </Route>
       </Routes>
     </>
   );

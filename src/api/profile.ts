@@ -1,6 +1,4 @@
-import { getToken } from "./auth";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+import apiClient, { extractError } from "../lib/apiClient";
 
 export type Profile = {
   id: string;
@@ -54,46 +52,28 @@ async function readError(response: Response, fallback: string): Promise<string> 
   }
 }
 
-function authHeaders(): HeadersInit {
-  const token = getToken();
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
-
 // ---------------------------------------------------------------------------
 // GET /api/profile/me
 // ---------------------------------------------------------------------------
 export async function fetchMyProfile(): Promise<Profile> {
-  const response = await fetch(`${API_URL}/profile/me`, {
-    headers: { ...authHeaders() },
-  });
-
-  if (!response.ok) {
-    throw new Error(await readError(response, "Could not load your profile"));
+  try {
+    const res = await apiClient.get<{ profile: Profile }>("/profile/me");
+    return res.data.profile;
+  } catch (err) {
+    throw new Error(extractError(err, "Could not load your profile"));
   }
-
-  const data = await response.json();
-  return data.profile;
 }
 
 // ---------------------------------------------------------------------------
 // PATCH /api/profile/me
 // ---------------------------------------------------------------------------
 export async function updateMyProfile(updates: ProfileUpdate): Promise<Profile> {
-  const response = await fetch(`${API_URL}/profile/me`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      ...authHeaders(),
-    },
-    body: JSON.stringify(updates),
-  });
-
-  if (!response.ok) {
-    throw new Error(await readError(response, "Could not save your profile"));
+  try {
+    const res = await apiClient.patch<{ profile: Profile }>("/profile/me", updates);
+    return res.data.profile;
+  } catch (err) {
+    throw new Error(extractError(err, "Could not save your profile"));
   }
-
-  const data = await response.json();
-  return data.profile;
 }
 
 // ---------------------------------------------------------------------------
@@ -106,16 +86,10 @@ export async function uploadMyCv(file: File): Promise<Profile> {
   const formData = new FormData();
   formData.append("cv", file);
 
-  const response = await fetch(`${API_URL}/profile/me/cv`, {
-    method: "POST",
-    headers: { ...authHeaders() },
-    body: formData,
-  });
-
-  if (!response.ok) {
-    throw new Error(await readError(response, "Could not upload your CV"));
+  try {
+    const res = await apiClient.post<{ profile: Profile }>("/profile/me/cv", formData);
+    return res.data.profile;
+  } catch (err) {
+    throw new Error(extractError(err, "Could not upload your CV"));
   }
-
-  const data = await response.json();
-  return data.profile;
 }

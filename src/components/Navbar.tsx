@@ -4,7 +4,6 @@ import Logo from "./Logo";
 import { useAuth } from "../context/AuthContext";
 
 const navLinks = [
-  { label: "How it Works", to: "/how-it-works" },
   { label: "Find Jobs", to: "/find-jobs" },
   { label: "For Companies", to: "/for-companies" },
 ];
