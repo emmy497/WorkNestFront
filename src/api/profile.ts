@@ -43,15 +43,6 @@ export type ProfileUpdate = Partial<
   >
 >;
 
-async function readError(response: Response, fallback: string): Promise<string> {
-  try {
-    const data = await response.json();
-    return data.message || fallback;
-  } catch {
-    return fallback;
-  }
-}
-
 // ---------------------------------------------------------------------------
 // GET /api/profile/me
 // ---------------------------------------------------------------------------
