@@ -1,14 +1,21 @@
 import { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import ApplicationCard from "../../components/ApplicationCard";
 import JobCard from "../../components/JobCard";
 import { fetchApplications } from "../../api/applications";
 import { fetchSavedJobs } from "../../api/savedJobs";
+import {
+  fetchNotifications,
+  markNotificationRead,
+  markAllNotificationsRead,
+} from "../../api/notifications";
 import { useSavedJobs } from "../../context/SavedJobsContext";
 import type { Application } from "../../types/application";
 import type { Job } from "../../types/job";
+import { notificationLook, type Notification } from "../../types/notification";
+import { formatShortRelativeTime } from "../../utils/formatShortRelativeTime";
 
 type Tab = "applications" | "saved" | "notifications";
 
@@ -18,7 +25,21 @@ const TABS: { key: Tab; label: string }[] = [
   { key: "notifications", label: "Notifications" },
 ];
 
+// True when an ISO date string falls on today's calendar day — used to
+// split notifications into the "Today" / "Earlier" groups the design calls
+// for, rather than a rolling 24-hour window.
+function isToday(isoDate: string): boolean {
+  const date = new Date(isoDate);
+  const now = new Date();
+  return (
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate()
+  );
+}
+
 const Applications = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>("applications");
 
   const [applications, setApplications] = useState<Application[]>([]);
@@ -32,6 +53,48 @@ const Applications = () => {
   const [savedJobs, setSavedJobs] = useState<Job[]>([]);
   const [savedLoading, setSavedLoading] = useState(true);
   const [savedError, setSavedError] = useState("");
+
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notifLoading, setNotifLoading] = useState(true);
+  const [notifError, setNotifError] = useState("");
+
+  // Fetched eagerly (not just when the tab is opened) so the tab badge
+  // shows the right unread count right away — same reasoning as
+  // applications/savedJobs above.
+  useEffect(() => {
+    fetchNotifications()
+      .then((data) => {
+        setNotifications(data.notifications);
+        setUnreadCount(data.unreadCount);
+      })
+      .catch(() => setNotifError("Could not load your notifications."))
+      .finally(() => setNotifLoading(false));
+  }, []);
+
+  function handleNotificationClick(notification: Notification) {
+    if (!notification.isRead) {
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === notification.id ? { ...n, isRead: true } : n)),
+      );
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+      markNotificationRead(notification.id).catch(() => {
+        // Best-effort — worst case it shows as unread again on next load.
+      });
+    }
+
+    if (notification.jobId) {
+      navigate(`/job-details/${notification.jobId}`);
+    }
+  }
+
+  function handleMarkAllRead() {
+    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    setUnreadCount(0);
+    markAllNotificationsRead().catch(() => {
+      // Best-effort, same as above.
+    });
+  }
 
   useEffect(() => {
     fetchApplications()
@@ -59,13 +122,13 @@ const Applications = () => {
   const shortlistedCount = applications.filter((app) => app.status === "shortlisted").length;
   const interviewCount = applications.filter((app) => app.status === "interview").length;
 
-  // Notifications aren't wired to real data yet — that count is a
-  // placeholder so the tab bar matches the design. TODO: replace once
-  // notifications have their own API + types.
+  // The Notifications badge shows how many are UNREAD, unlike the other two
+  // tabs (which show a total count) — that's what people expect from a
+  // notifications badge.
   const tabCounts: Record<Tab, number> = {
     applications: applications.length,
     saved: savedCount,
-    notifications: 0,
+    notifications: unreadCount,
   };
 
   return (
@@ -210,14 +273,99 @@ const Applications = () => {
 
         {activeTab === "notifications" && (
           <section className="mb-24 lg:mb-[140px]">
-            <div className="rounded-[24px] border-[1.07px] border-[#ECEBF0] bg-[#FAFAFB] p-10 text-center">
-              <div className="font-['Bricolage_Grotesque'] font-bold text-[18px] text-[#161320]">
-                No notifications yet
+            {notifLoading ? (
+              <div className="rounded-[24px] border-[1.07px] border-[#ECEBF0] bg-[#FAFAFB] p-10 text-center font-['Inter'] text-[13.5px] text-[#4B4757]">
+                Loading your notifications…
               </div>
-              <p className="mt-2 font-['Inter'] text-[13.5px] text-[#4B4757]">
-                Updates on your applications will appear here.
-              </p>
-            </div>
+            ) : notifError ? (
+              <div className="rounded-[24px] border-[1.07px] border-[#FFD5D5] bg-[#FFF7F7] p-10 text-center">
+                <div className="font-['Bricolage_Grotesque'] font-bold text-[18px] text-[#161320]">
+                  Something went wrong
+                </div>
+                <p className="mt-2 font-['Inter'] text-[13.5px] text-[#4B4757]">
+                  {notifError}
+                </p>
+              </div>
+            ) : notifications.length === 0 ? (
+              <div className="rounded-[24px] border-[1.07px] border-[#ECEBF0] bg-[#FAFAFB] p-10 text-center">
+                <div className="font-['Bricolage_Grotesque'] font-bold text-[18px] text-[#161320]">
+                  No notifications yet
+                </div>
+                <p className="mt-2 font-['Inter'] text-[13.5px] text-[#4B4757]">
+                  Updates on your applications will appear here.
+                </p>
+              </div>
+            ) : (
+              <>
+                {unreadCount > 0 && (
+                  <div className="mb-[16px] flex justify-end">
+                    <button
+                      type="button"
+                      onClick={handleMarkAllRead}
+                      className="font-['Inter'] text-[13px] font-semibold text-[#6D4AFF] hover:underline"
+                    >
+                      Mark all as read
+                    </button>
+                  </div>
+                )}
+
+                {(
+                  [
+                    { key: "today", label: "Today", items: notifications.filter((n) => isToday(n.createdAt)) },
+                    { key: "earlier", label: "Earlier", items: notifications.filter((n) => !isToday(n.createdAt)) },
+                  ] as const
+                )
+                  .filter((group) => group.items.length > 0)
+                  .map((group) => (
+                    <div key={group.key} className="mb-[24px]">
+                      <div className="mb-[12px] font-['Inter'] font-medium text-[11.5px] leading-[17.25px] tracking-[1.61px] uppercase text-[#8B8798]">
+                        {group.label}
+                      </div>
+
+                      <div className="flex flex-col gap-[10px]">
+                        {group.items.map((notification) => {
+                          const look = notificationLook(notification);
+                          const Icon = look.icon;
+
+                          return (
+                            <button
+                              key={notification.id}
+                              type="button"
+                              onClick={() => handleNotificationClick(notification)}
+                              className={`flex w-full items-start gap-[14px] rounded-[16px] border-[1.07px] border-[#ECEBF0] p-[16px] text-left transition ${
+                                notification.isRead ? "bg-white" : "bg-[#FAF8FF]"
+                              }`}
+                            >
+                              <span
+                                className="flex size-[38px] shrink-0 items-center justify-center rounded-full"
+                                style={{ backgroundColor: look.iconBg, color: look.iconColor }}
+                              >
+                                <Icon size={17} />
+                              </span>
+
+                              <span className="min-w-0 flex-1">
+                                <span className="block font-['Inter'] text-[13.5px] font-semibold text-[#161320]">
+                                  {notification.title}
+                                </span>
+                                <span className="block font-['Inter'] text-[13px] text-[#8B8798]">
+                                  {notification.body}
+                                </span>
+                                <span className="block font-['Inter'] text-[11.5px] text-[#8B8798]">
+                                  {formatShortRelativeTime(notification.createdAt)}
+                                </span>
+                              </span>
+
+                              {!notification.isRead && (
+                                <span className="mt-[6px] size-[8px] shrink-0 rounded-full bg-[#6D4AFF]" />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+              </>
+            )}
           </section>
         )}
       </div>
