@@ -17,11 +17,11 @@ const HowSection = () => {
         </div>
         <div className="flex flex-col lg:flex-row lg:justify-between mb-10 lg:mb-[63px] gap-6 lg:gap-[165px]">
           <div className="font-['Bricolage_Grotesque'] font-bold text-3xl sm:text-4xl lg:text-[46px] leading-tight lg:leading-[47.84px] tracking-tight lg:tracking-[-1.29px] align-middle [leading-trim:none]">
-            Four steps. One of them is the reason people stay{" "}
+            Three steps. One of them is the reason people stay
           </div>
           <div className="font-['Inter'] font-normal text-base lg:text-[18px] leading-relaxed lg:leading-[28.8px] tracking-normal align-middle [leading-trim:none] text-[#4B4757]">
             Most job sites end when you hit submit. Ours is just getting started
-            because a person on our team picks up your application from there.
+            because a person on our team picks up your application from there.h
           </div>
         </div>
 
@@ -94,12 +94,13 @@ const HowSection = () => {
       <section className="mt-16 lg:mt-[155px] px-4 sm:px-8 md:px-16 lg:px-[100px] mb-16 lg:mb-[140px]">
         <div className="flex flex-col w-full max-w-[570px] h-auto gap-4 lg:gap-[34px] mx-auto mb-10 lg:mb-[68px]">
           <div className="font-['Bricolage_Grotesque'] font-bold text-3xl sm:text-4xl lg:text-[46px] leading-tight lg:leading-[47.84px] tracking-tight lg:tracking-[-1.29px] text-center align-middle [leading-trim:none]">
-            Four steps. One of them is the reason people stay{" "}
+            The opposite of shouting into a void.
           </div>
 
           <div className="font-['Inter'] font-normal text-base lg:text-[18px] leading-relaxed lg:leading-[28.8px] tracking-normal text-center align-middle [leading-trim:none] text-[#4B4757]">
-            Most job sites end when you hit submit. Ours is just getting started
-            because a person on our team picks up your application from there.
+            A job board hosts a form and hopes for the best. WorkNest sits
+            between you and the company and does the work that usually goes
+            missing.
           </div>
         </div>
 
