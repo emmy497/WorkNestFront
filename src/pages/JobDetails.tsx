@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { NavLink, useParams } from "react-router-dom";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { FiArrowLeft, FiCheck } from "react-icons/fi";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import SaveJobButton from "../components/SaveJobButton";
+import ApplyGateModal from "../components/ApplyGateModal";
 import { fetchJobById } from "../api/jobs";
+import { useAuth } from "../context/AuthContext";
 import type { Job } from "../types/job";
 
 const formatSalary = (amount: number, currency: string) =>
@@ -15,9 +17,22 @@ const formatSalary = (amount: number, currency: string) =>
 const JobDetails = () => {
   // Reads the ":jobId" part of the URL, e.g. /job-details/6a94cf...
   const { jobId } = useParams<{ jobId: string }>();
+  const navigate = useNavigate();
+  const { isLoggedIn } = useAuth();
 
   const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showApplyGate, setShowApplyGate] = useState(false);
+
+  // Logged in — go straight to the wizard, same as always. Logged out —
+  // show the modal instead of the ProtectedRoute redirect this used to be.
+  function handleApplyClick() {
+    if (isLoggedIn) {
+      navigate(`/apply/${jobId}`);
+    } else {
+      setShowApplyGate(true);
+    }
+  }
 
   // Runs on load, AND again whenever jobId changes — because [jobId] is the
   // dependency array. Without jobId in there, clicking a different job would
@@ -149,12 +164,13 @@ const JobDetails = () => {
                 jobTitle={job.title}
                 variant="circle"
               />
-              <NavLink
-                to={`/apply/${job.id}`}
+              <button
+                type="button"
+                onClick={handleApplyClick}
                 className="flex h-[38px] items-center rounded-full bg-[#6D4AFF] px-[22px] font-['Inter'] font-semibold text-[13.5px] text-white shadow-[0px_6px_18px_0px_rgba(109,74,255,0.25)]"
               >
                 Apply now
-              </NavLink>
+              </button>
             </div>
           </div>
 
@@ -243,12 +259,13 @@ const JobDetails = () => {
                 Closes in {closesInDays} {closesInDays === 1 ? "day" : "days"}
               </div>
 
-              <NavLink
-                to={`/apply/${job.id}`}
+              <button
+                type="button"
+                onClick={handleApplyClick}
                 className="mt-[18px] flex h-[42px] w-full items-center justify-center rounded-full bg-[#6D4AFF] font-['Inter'] font-semibold text-[13.5px] text-white shadow-[0px_6px_18px_0px_rgba(109,74,255,0.25)]"
               >
                 Apply now
-              </NavLink>
+              </button>
               <button
                 type="button"
                 className="mt-[10px] h-[42px] w-full rounded-full bg-[#EFEAFF] font-['Inter'] font-semibold text-[13.5px] text-[#6D4AFF]"
@@ -304,6 +321,14 @@ const JobDetails = () => {
       </div>
 
       <Footer />
+
+      {showApplyGate && (
+        <ApplyGateModal
+          jobId={job.id}
+          jobTitle={job.title}
+          onClose={() => setShowApplyGate(false)}
+        />
+      )}
     </>
   );
 };

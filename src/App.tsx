@@ -29,14 +29,10 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/find-jobs" element={<FindJobs />} />
         <Route path="/job-details/:jobId" element={<JobDetails />} />
-        <Route
-          path="/apply/:jobId"
-          element={
-            <ProtectedRoute>
-              <Apply />
-            </ProtectedRoute>
-          }
-        />
+        {/* No ProtectedRoute here — a guest can apply without an account.
+            The gate is the ApplyGateModal shown from JobDetails, not the
+            route itself. */}
+        <Route path="/apply/:jobId" element={<Apply />} />
         <Route
           path="/profile"
           element={

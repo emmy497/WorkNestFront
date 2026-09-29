@@ -26,11 +26,13 @@ const VerifyEmail = () => {
   const { verifyEmail } = useAuth();
   const navigate = useNavigate();
 
-  // The SignUp page sends the email across when it navigates here, using
-  // navigate("/verify-email", { state: { email } }).
-  // We read it back out of location.state.
+  // The SignUp (and Login, for the "needs verification" case) pages send
+  // the email — and possibly a `from` to return to afterwards — across
+  // when they navigate here. We read both back out of location.state.
   const location = useLocation();
-  const emailFromSignup = (location.state as { email?: string } | null)?.email;
+  const routeState = location.state as { email?: string; from?: string } | null;
+  const emailFromSignup = routeState?.email;
+  const from = routeState?.from || "/find-jobs";
 
   // If someone lands here directly with no email in the state, we let them
   // type it in rather than showing a broken page.
@@ -60,8 +62,8 @@ const VerifyEmail = () => {
 
     try {
       await verifyEmail(email, otp);
-      // Verified and logged in — send them to the jobs page.
-      navigate("/find-jobs");
+      // Verified and logged in — back to wherever they were headed.
+      navigate(from);
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "Could not verify that code",

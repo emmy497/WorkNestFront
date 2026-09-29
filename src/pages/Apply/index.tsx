@@ -13,6 +13,7 @@ import {
 } from "../../api/applications";
 import { uploadMyCv } from "../../api/profile";
 import { toast } from "../../lib/toast";
+import { useAuth } from "../../context/AuthContext";
 import type { Job } from "../../types/job";
 
 // The dropdown options. These match the ones on the Edit Profile page, so a
@@ -57,6 +58,10 @@ const labelClass =
 const Apply = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
+  // authLoading: whether AuthContext has finished checking the saved token
+  // yet. Without waiting on it, a genuinely logged-in candidate whose token
+  // check hasn't resolved yet would briefly be treated as a guest.
+  const { isLoggedIn, loading: authLoading } = useAuth();
 
   const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
@@ -88,10 +93,13 @@ const Apply = () => {
     setDraft((prev) => ({ ...prev, [key]: value }));
   }
 
-  // Load the job, the profile prefill, and whether they've already applied —
-  // all three at once rather than one after another.
+  // Load the job, and — only for a logged-in candidate — the profile
+  // prefill and whether they've already applied. A guest has no profile to
+  // prefill from and no account to check "already applied" against, and
+  // both of those calls 401 without a token, so they're skipped entirely
+  // rather than failing the whole Promise.all.
   useEffect(() => {
-    if (!jobId) return;
+    if (!jobId || authLoading) return;
 
     let cancelled = false;
 
@@ -99,15 +107,15 @@ const Apply = () => {
       try {
         const [jobData, prefill, applied] = await Promise.all([
           fetchJobById(jobId as string),
-          fetchApplicationPrefill(),
-          checkAlreadyApplied(jobId as string),
+          isLoggedIn ? fetchApplicationPrefill() : Promise.resolve(null),
+          isLoggedIn ? checkAlreadyApplied(jobId as string) : Promise.resolve(null),
         ]);
 
         if (cancelled) return;
 
         // Already applied — send them to their applications instead of
         // letting them fill in a form that will be rejected.
-        if (applied.applied) {
+        if (applied?.applied) {
           toast.info("You've already applied", jobData.title);
           navigate("/applications");
           return;
@@ -115,16 +123,20 @@ const Apply = () => {
 
         setJob(jobData);
 
-        setDraft((prev) => ({
-          ...prev,
-          ...prefill,
-          // Default the salary field to the job's own range, as a starting
-          // point the candidate can edit.
-          expectedSalary: formatRange(jobData),
-        }));
+        if (prefill) {
+          setDraft((prev) => ({
+            ...prev,
+            ...prefill,
+            // Default the salary field to the job's own range, as a starting
+            // point the candidate can edit.
+            expectedSalary: formatRange(jobData),
+          }));
 
-        // If we got a name and email back, step 1 is already filled in.
-        setPrefilled(Boolean(prefill.fullName && prefill.email));
+          // If we got a name and email back, step 1 is already filled in.
+          setPrefilled(Boolean(prefill.fullName && prefill.email));
+        } else {
+          setDraft((prev) => ({ ...prev, expectedSalary: formatRange(jobData) }));
+        }
       } catch {
         if (!cancelled) toast.error("Could not open the application");
       } finally {
@@ -139,7 +151,7 @@ const Apply = () => {
     return () => {
       cancelled = true;
     };
-  }, [jobId, navigate]);
+  }, [jobId, navigate, isLoggedIn, authLoading]);
 
   function formatRange(j: Job): string {
     const fmt = (n: number) =>

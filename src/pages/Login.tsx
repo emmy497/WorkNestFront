@@ -14,9 +14,12 @@ const Login = () => {
   const navigate = useNavigate();
 
   // The reset-password flow sends a success message here when it finishes.
+  // The Apply-gate modal sends `from` — where to land after logging in,
+  // e.g. back on the job application that prompted the login.
   const location = useLocation();
-  const noticeFromRedirect = (location.state as { notice?: string } | null)
-    ?.notice;
+  const state = location.state as { notice?: string; from?: string } | null;
+  const noticeFromRedirect = state?.notice;
+  const from = state?.from || "/find-jobs";
 
   // Controlled inputs: React state holds the value, not the DOM.
   const [email, setEmail] = useState("");
@@ -36,7 +39,7 @@ const Login = () => {
       try {
         await loginWithGoogle(tokenResponse.access_token);
         toast.success("Welcome back");
-        navigate("/find-jobs");
+        navigate(from);
       } catch (err) {
         toast.error(
           "Could not sign you in with Google",
@@ -70,14 +73,14 @@ const Login = () => {
     try {
       await login(email, password);
       toast.success("Welcome back");
-      navigate("/find-jobs"); // logged in — send them to the jobs page
+      navigate(from); // logged in — back to wherever they were headed
     } catch (err) {
       // Special case: the password was right, but they never confirmed
       // their email. Send them straight to the verify page instead of
       // leaving them stuck on an error message.
       if (err instanceof NeedsVerificationError) {
         toast.info("Verify your email", "We sent you a new code.");
-        navigate("/verify-email", { state: { email: err.email } });
+        navigate("/verify-email", { state: { email: err.email, from } });
         return;
       }
 

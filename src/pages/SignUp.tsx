@@ -1,5 +1,5 @@
 import AuthLayout from "../Layout/AuthLayout";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useState, type FormEvent } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useGoogleLogin } from "@react-oauth/google";
@@ -11,6 +11,11 @@ const SignUp = () => {
 
   const { register, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
+
+  // The Apply-gate modal sends `from` — where to land once the account is
+  // ready, e.g. back on the job application that prompted the signup.
+  const location = useLocation();
+  const from = (location.state as { from?: string } | null)?.from || "/find-jobs";
 
   // One piece of state per field.
   const [name, setName] = useState("");
@@ -30,7 +35,7 @@ const SignUp = () => {
       try {
         await loginWithGoogle(tokenResponse.access_token);
         toast.success("Welcome to WorkNest");
-        navigate("/find-jobs");
+        navigate(from);
       } catch (err) {
         toast.error(
           "Could not sign you up with Google",
@@ -66,9 +71,9 @@ const SignUp = () => {
       await register(name, email, password);
 
       // The account exists but isn't verified yet, so we don't have a token.
-      // Send them to the verify page, passing the email along in the
-      // navigation state so they don't have to type it again.
-      navigate("/verify-email", { state: { email } });
+      // Send them to the verify page, passing the email (and `from`) along
+      // in the navigation state so they don't have to type it again.
+      navigate("/verify-email", { state: { email, from } });
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "Could not create your account",

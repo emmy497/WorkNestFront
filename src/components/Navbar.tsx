@@ -3,10 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import Logo from "./Logo";
 import { useAuth } from "../context/AuthContext";
 
-const navLinks = [
-  { label: "Find Jobs", to: "/find-jobs" },
-  { label: "For Companies", to: "/for-companies" },
-];
+const navLinks = [{ label: "Find Jobs", to: "/find-jobs" }];
 
 const linkClass = ({ isActive }: { isActive: boolean }) =>
   isActive ? "text-[#6D4AFF]" : "text-[#4B4568] hover:text-[#161320]";
