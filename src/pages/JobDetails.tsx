@@ -256,7 +256,9 @@ const JobDetails = () => {
               </div>
 
               <div className="mt-[6px] font-['Inter'] text-[11.5px] text-[#8A5A12]">
-                Closes in {closesInDays} {closesInDays === 1 ? "day" : "days"}
+                {closesInDays === 0
+                  ? "Closes today"
+                  : `Closes in ${closesInDays} ${closesInDays === 1 ? "day" : "days"}`}
               </div>
 
               <button

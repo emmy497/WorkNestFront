@@ -110,7 +110,9 @@ const JobCard = ({
         </div>
 
         <div className="whitespace-nowrap font-['Inter'] font-normal text-[11.2px] leading-[16.8px] text-[#8A5A12] [leading-trim:none]">
-          Closes in {closesInDays} {closesInDays === 1 ? "day" : "days"}
+          {closesInDays === 0
+            ? "Closes today"
+            : `Closes in ${closesInDays} ${closesInDays === 1 ? "day" : "days"}`}
         </div>
       </div>
     </NavLink>
