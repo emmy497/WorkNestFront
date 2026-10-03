@@ -13,6 +13,10 @@ import EditProfile from "./pages/EditProfile";
 import Applications from "./pages/Applications";
 import AdminLayout from "./pages/Admin/AdminLayout";
 import AdminOverview from "./pages/Admin/Overview";
+import Jobs from "./pages/Admin/Jobs";
+import JobEditor from "./pages/Admin/JobEditor";
+import Clients from "./pages/Admin/Clients";
+import ClientDetail from "./pages/Admin/ClientDetail";
 import Pipeline from "./pages/Admin/Pipeline";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ScrollToTop from "./components/ScrollToTop";
@@ -74,6 +78,10 @@ function App() {
           }
         >
           <Route index element={<AdminOverview />} />
+          <Route path="jobs" element={<Jobs />} />
+          <Route path="jobs/new" element={<JobEditor />} />
+          <Route path="clients" element={<Clients />} />
+          <Route path="clients/:id" element={<ClientDetail />} />
           {/* Both routes render the same Pipeline component — the review
               screen is a slide-over inside it, not a separate page, so the
               list underneath must never unmount when :id shows up. */}
