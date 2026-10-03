@@ -22,6 +22,12 @@ const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [errors, setErrors] = useState<{
+    name?: string;
+    email?: string;
+    password?: string;
+    confirmPassword?: string;
+  }>({});
   const [submitting, setSubmitting] = useState(false);
   const [googleSubmitting, setGoogleSubmitting] = useState(false);
 
@@ -53,15 +59,25 @@ const SignUp = () => {
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    // Check this here so the user gets told immediately, instead of
-    // waiting for the server to reject it.
-    if (password.length < 6) {
-      toast.error("Password must be at least 6 characters");
-      return;
+    // Checked here so the user gets told immediately, instead of waiting
+    // for the server to reject it.
+    const nextErrors: typeof errors = {};
+    if (!name.trim()) nextErrors.name = "Full name is required";
+    if (!email.trim()) nextErrors.email = "Email address is required";
+    if (!password) {
+      nextErrors.password = "Password is required";
+    } else if (password.length < 6) {
+      nextErrors.password = "Password must be at least 6 characters";
+    }
+    if (!confirmPassword) {
+      nextErrors.confirmPassword = "Please confirm your password";
+    } else if (password !== confirmPassword) {
+      nextErrors.confirmPassword = "Those passwords do not match";
     }
 
-    if (password !== confirmPassword) {
-      toast.error("Those passwords do not match");
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) {
+      toast.error(Object.values(nextErrors)[0]);
       return;
     }
 
@@ -87,6 +103,7 @@ const SignUp = () => {
     <AuthLayout>
       <form
         onSubmit={handleSubmit}
+        noValidate
         className="bg-[#FFFFFF] rounded-[20px] sm:rounded-[28px] p-6 sm:p-[32px] flex flex-col gap-6 sm:gap-[31px] w-full font-['Inter']"
       >
         <div className="text-start">
@@ -104,13 +121,18 @@ const SignUp = () => {
               Full name
             </div>
             <input
-              className="w-full h-[45px] rounded-[12.61px] border-[1.05px] border-[#ECEBF0] py-[14px] px-[15.76px] text-[14px] text-[#161320] outline-none transition placeholder:text-[#8B8798] focus:border-[#6D4AFF]"
+              className={`w-full h-[45px] rounded-[12.61px] border-[1.05px] py-[14px] px-[15.76px] text-[14px] text-[#161320] outline-none transition placeholder:text-[#8B8798] ${
+                errors.name ? "border-[#D14343]" : "border-[#ECEBF0] focus:border-[#6D4AFF]"
+              }`}
               type="text"
               placeholder="Enter full name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
+              onChange={(e) => {
+                setName(e.target.value);
+                if (errors.name) setErrors((prev) => ({ ...prev, name: undefined }));
+              }}
             />
+            {errors.name && <p className="mt-[6px] text-[12px] text-[#D14343]">{errors.name}</p>}
           </div>
 
           <div className="mb-[8px] ">
@@ -118,13 +140,18 @@ const SignUp = () => {
               Email address
             </div>
             <input
-              className="w-full h-[45px] rounded-[12.61px] border-[1.05px] border-[#ECEBF0] py-[14px] px-[15.76px] text-[14px] text-[#161320] outline-none transition placeholder:text-[#8B8798] focus:border-[#6D4AFF]"
+              className={`w-full h-[45px] rounded-[12.61px] border-[1.05px] py-[14px] px-[15.76px] text-[14px] text-[#161320] outline-none transition placeholder:text-[#8B8798] ${
+                errors.email ? "border-[#D14343]" : "border-[#ECEBF0] focus:border-[#6D4AFF]"
+              }`}
               type="email"
               placeholder="Enter email address"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }));
+              }}
             />
+            {errors.email && <p className="mt-[6px] text-[12px] text-[#D14343]">{errors.email}</p>}
           </div>
 
           <div className="mt-[8px]">
@@ -137,9 +164,13 @@ const SignUp = () => {
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full h-[45px] rounded-[12.61px] border-[1.05px] border-[#ECEBF0] py-[14px] pl-[15.76px] pr-[44px] text-[14px] text-[#161320] outline-none transition placeholder:text-[#8B8798] focus:border-[#6D4AFF]"
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (errors.password) setErrors((prev) => ({ ...prev, password: undefined }));
+                }}
+                className={`w-full h-[45px] rounded-[12.61px] border-[1.05px] py-[14px] pl-[15.76px] pr-[44px] text-[14px] text-[#161320] outline-none transition placeholder:text-[#8B8798] ${
+                  errors.password ? "border-[#D14343]" : "border-[#ECEBF0] focus:border-[#6D4AFF]"
+                }`}
               />
 
               <button
@@ -151,6 +182,9 @@ const SignUp = () => {
                 {showPassword ? <FiEyeOff size={19} /> : <FiEye size={19} />}
               </button>
             </div>
+            {errors.password && (
+              <p className="mb-[8px] text-[12px] text-[#D14343]">{errors.password}</p>
+            )}
           </div>
 
           {/* Confirm password */}
@@ -164,9 +198,16 @@ const SignUp = () => {
                 type={showPassword ? "text" : "password"}
                 placeholder="Re-enter password"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                className="w-full h-[45px] rounded-[12.61px] border-[1.05px] border-[#ECEBF0] py-[14px] pl-[15.76px] pr-[44px] text-[14px] text-[#161320] outline-none transition placeholder:text-[#8B8798] focus:border-[#6D4AFF]"
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                  if (errors.confirmPassword)
+                    setErrors((prev) => ({ ...prev, confirmPassword: undefined }));
+                }}
+                className={`w-full h-[45px] rounded-[12.61px] border-[1.05px] py-[14px] pl-[15.76px] pr-[44px] text-[14px] text-[#161320] outline-none transition placeholder:text-[#8B8798] ${
+                  errors.confirmPassword
+                    ? "border-[#D14343]"
+                    : "border-[#ECEBF0] focus:border-[#6D4AFF]"
+                }`}
               />
 
               <button
@@ -178,6 +219,9 @@ const SignUp = () => {
                 {showPassword ? <FiEyeOff size={19} /> : <FiEye size={19} />}
               </button>
             </div>
+            {errors.confirmPassword && (
+              <p className="mb-[8px] text-[12px] text-[#D14343]">{errors.confirmPassword}</p>
+            )}
           </div>
         </div>
 

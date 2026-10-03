@@ -40,6 +40,7 @@ const VerifyEmail = () => {
   const [otp, setOtp] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [resending, setResending] = useState(false);
+  const [errors, setErrors] = useState<{ email?: string; otp?: string }>({});
 
   const [secondsLeft, setSecondsLeft] = useState(RESEND_COOLDOWN_SECONDS);
 
@@ -53,8 +54,13 @@ const VerifyEmail = () => {
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (otp.length !== 6) {
-      toast.error("Enter the full 6-digit code");
+    const nextErrors: typeof errors = {};
+    if (!email.trim()) nextErrors.email = "Email address is required";
+    if (otp.length !== 6) nextErrors.otp = "Enter the full 6-digit code";
+
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) {
+      toast.error(Object.values(nextErrors)[0]);
       return;
     }
 
@@ -94,6 +100,7 @@ const VerifyEmail = () => {
     <AuthLayout>
       <form
         onSubmit={handleSubmit}
+        noValidate
         className="bg-[#FFFFFF] rounded-[20px] sm:rounded-[28px] p-6 sm:p-[32px] flex flex-col gap-6 sm:gap-[28px] w-full font-['Inter']"
       >
         <div className="text-start">
@@ -118,10 +125,15 @@ const VerifyEmail = () => {
               type="email"
               placeholder="Enter email address"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full h-[45px] rounded-[12.61px] border-[1.05px] border-[#ECEBF0] py-[14px] px-[15.76px] text-[14px] text-[#161320] outline-none transition placeholder:text-[#8B8798] focus:border-[#6D4AFF]"
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }));
+              }}
+              className={`w-full h-[45px] rounded-[12.61px] border-[1.05px] py-[14px] px-[15.76px] text-[14px] text-[#161320] outline-none transition placeholder:text-[#8B8798] ${
+                errors.email ? "border-[#D14343]" : "border-[#ECEBF0] focus:border-[#6D4AFF]"
+              }`}
             />
+            {errors.email && <p className="mt-[6px] text-[12px] text-[#D14343]">{errors.email}</p>}
           </div>
         )}
 
@@ -130,6 +142,7 @@ const VerifyEmail = () => {
             Verification code
           </div>
           <OtpInput value={otp} onChange={setOtp} />
+          {errors.otp && <p className="mt-[6px] text-[12px] text-[#D14343]">{errors.otp}</p>}
         </div>
 
         <div>

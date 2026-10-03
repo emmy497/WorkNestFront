@@ -25,6 +25,10 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  // Inline, field-level messages — set on a failed submit attempt, cleared
+  // the moment that field is edited again.
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+
   const [submitting, setSubmitting] = useState(false);
   const [googleSubmitting, setGoogleSubmitting] = useState(false);
 
@@ -68,6 +72,13 @@ const Login = () => {
     // behaviour for a form submit.
     e.preventDefault();
 
+    const nextErrors: typeof errors = {};
+    if (!email.trim()) nextErrors.email = "Email address is required";
+    if (!password) nextErrors.password = "Password is required";
+
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) return;
+
     setSubmitting(true);
 
     try {
@@ -100,6 +111,7 @@ const Login = () => {
     <AuthLayout>
       <form
         onSubmit={handleSubmit}
+        noValidate
         className="bg-[#FFFFFF] rounded-[20px] sm:rounded-[28px] p-6 sm:p-[32px] flex flex-col gap-6 sm:gap-[31px] w-full font-['Inter']"
       >
         <div className="text-start">
@@ -118,13 +130,20 @@ const Login = () => {
               Email address
             </div>
             <input
-              className="w-full h-[45px] rounded-[12.61px] border-[1.05px] border-[#ECEBF0] py-[14px] px-[15.76px] text-[14px] text-[#161320] outline-none transition placeholder:text-[#8B8798] focus:border-[#6D4AFF]"
+              className={`w-full h-[45px] rounded-[12.61px] border-[1.05px] py-[14px] px-[15.76px] text-[14px] text-[#161320] outline-none transition placeholder:text-[#8B8798] ${
+                errors.email ? "border-[#D14343]" : "border-[#ECEBF0] focus:border-[#6D4AFF]"
+              }`}
               type="email"
               placeholder="Enter email address"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }));
+              }}
             />
+            {errors.email && (
+              <p className="mt-[6px] text-[12px] text-[#D14343]">{errors.email}</p>
+            )}
           </div>
 
           <div className="mt-[16px]">
@@ -134,11 +153,18 @@ const Login = () => {
             <input
               type="password"
               placeholder="Enter password"
-              className="w-full h-[45px] rounded-[12.61px] border-[1.05px] border-[#ECEBF0] py-[14px] px-[15.76px] mb-[8px] text-[14px] text-[#161320] outline-none transition placeholder:text-[#8B8798] focus:border-[#6D4AFF]"
+              className={`w-full h-[45px] rounded-[12.61px] border-[1.05px] py-[14px] px-[15.76px] mb-[8px] text-[14px] text-[#161320] outline-none transition placeholder:text-[#8B8798] ${
+                errors.password ? "border-[#D14343]" : "border-[#ECEBF0] focus:border-[#6D4AFF]"
+              }`}
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (errors.password) setErrors((prev) => ({ ...prev, password: undefined }));
+              }}
             />
+            {errors.password && (
+              <p className="mb-[8px] text-[12px] text-[#D14343]">{errors.password}</p>
+            )}
           </div>
 
           <NavLink

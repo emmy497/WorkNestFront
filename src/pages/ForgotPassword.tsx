@@ -39,6 +39,13 @@ const ForgotPassword = () => {
   const [submitting, setSubmitting] = useState(false);
   const [resending, setResending] = useState(false);
 
+  const [errors, setErrors] = useState<{
+    email?: string;
+    otp?: string;
+    newPassword?: string;
+    confirmPassword?: string;
+  }>({});
+
   const [secondsLeft, setSecondsLeft] = useState(RESEND_COOLDOWN_SECONDS);
 
   useEffect(() => {
@@ -51,6 +58,13 @@ const ForgotPassword = () => {
   // --- STEP 1: send the code -----------------------------------------------
   async function handleSendCode(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
+    if (!email.trim()) {
+      setErrors({ email: "Email address is required" });
+      return;
+    }
+    setErrors({});
+
     setSubmitting(true);
 
     try {
@@ -72,9 +86,11 @@ const ForgotPassword = () => {
     e.preventDefault();
 
     if (otp.length !== 6) {
+      setErrors({ otp: "Enter the full 6-digit code" });
       toast.error("Enter the full 6-digit code");
       return;
     }
+    setErrors({});
 
     setSubmitting(true);
 
@@ -113,13 +129,21 @@ const ForgotPassword = () => {
   async function handleReset(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (newPassword.length < 6) {
-      toast.error("Password must be at least 6 characters");
-      return;
+    const nextErrors: typeof errors = {};
+    if (!newPassword) {
+      nextErrors.newPassword = "Password is required";
+    } else if (newPassword.length < 6) {
+      nextErrors.newPassword = "Password must be at least 6 characters";
+    }
+    if (!confirmPassword) {
+      nextErrors.confirmPassword = "Please confirm your password";
+    } else if (newPassword !== confirmPassword) {
+      nextErrors.confirmPassword = "Those passwords do not match";
     }
 
-    if (newPassword !== confirmPassword) {
-      toast.error("Those passwords do not match");
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) {
+      toast.error(Object.values(nextErrors)[0]);
       return;
     }
 
@@ -166,6 +190,7 @@ const ForgotPassword = () => {
               ? handleVerifyOtp
               : handleReset
         }
+        noValidate
         className="bg-[#FFFFFF] rounded-[20px] sm:rounded-[28px] p-6 sm:p-[32px] flex flex-col gap-6 sm:gap-[28px] w-full font-['Inter']"
       >
         <div className="text-start">
@@ -183,13 +208,16 @@ const ForgotPassword = () => {
               Email address
             </div>
             <input
-              className={inputClass}
+              className={`${inputClass} ${errors.email ? "border-[#D14343] focus:border-[#D14343]" : ""}`}
               type="email"
               placeholder="Enter email address"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }));
+              }}
             />
+            {errors.email && <p className="mt-[6px] text-[12px] text-[#D14343]">{errors.email}</p>}
           </div>
         )}
 
@@ -199,6 +227,7 @@ const ForgotPassword = () => {
               Verification code
             </div>
             <OtpInput value={otp} onChange={setOtp} />
+            {errors.otp && <p className="mt-[6px] text-[12px] text-[#D14343]">{errors.otp}</p>}
           </div>
         )}
 
@@ -213,9 +242,14 @@ const ForgotPassword = () => {
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter new password"
                   value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  required
-                  className={`${inputClass} pr-[44px]`}
+                  onChange={(e) => {
+                    setNewPassword(e.target.value);
+                    if (errors.newPassword)
+                      setErrors((prev) => ({ ...prev, newPassword: undefined }));
+                  }}
+                  className={`${inputClass} pr-[44px] ${
+                    errors.newPassword ? "border-[#D14343] focus:border-[#D14343]" : ""
+                  }`}
                 />
                 <button
                   type="button"
@@ -226,6 +260,9 @@ const ForgotPassword = () => {
                   {showPassword ? <FiEyeOff size={19} /> : <FiEye size={19} />}
                 </button>
               </div>
+              {errors.newPassword && (
+                <p className="mt-[6px] text-[12px] text-[#D14343]">{errors.newPassword}</p>
+              )}
             </div>
 
             <div>
@@ -237,9 +274,14 @@ const ForgotPassword = () => {
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm new password"
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  className={`${inputClass} pr-[44px]`}
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    if (errors.confirmPassword)
+                      setErrors((prev) => ({ ...prev, confirmPassword: undefined }));
+                  }}
+                  className={`${inputClass} pr-[44px] ${
+                    errors.confirmPassword ? "border-[#D14343] focus:border-[#D14343]" : ""
+                  }`}
                 />
                 <button
                   type="button"
@@ -256,6 +298,9 @@ const ForgotPassword = () => {
                   )}
                 </button>
               </div>
+              {errors.confirmPassword && (
+                <p className="mt-[6px] text-[12px] text-[#D14343]">{errors.confirmPassword}</p>
+              )}
             </div>
           </div>
         )}
