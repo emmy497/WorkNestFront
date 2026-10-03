@@ -245,6 +245,19 @@ function ApplicationReviewBody({
         <p className="font-['Inter'] text-[13.5px] leading-relaxed text-[#4B4757]">
           {application.whyThisRole}
         </p>
+
+        {/* Only present on jobs whose poster added questions of their own —
+            see JobEditor.tsx's "Screening questions" section. */}
+        {application.screeningAnswers.map((entry, index) => (
+          <div key={index} className="mt-[14px]">
+            <div className="mb-[4px] font-['Inter'] text-[12.5px] font-semibold text-[#161320]">
+              {entry.question}
+            </div>
+            <p className="font-['Inter'] text-[13.5px] leading-relaxed text-[#4B4757]">
+              {entry.answer}
+            </p>
+          </div>
+        ))}
       </div>
 
       {/* scorecard */}

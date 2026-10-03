@@ -26,7 +26,7 @@ const groups: { key: FilterKey; label: string; options: string[] }[] = [
   {
     key: "jobType",
     label: "Job type",
-    options: ["Full-time", "Contract", "Internship"],
+    options: ["Full-time", "Contract", "Internship", "Part-time"],
   },
   {
     key: "experienceLevel",

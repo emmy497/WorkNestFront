@@ -154,6 +154,7 @@ export interface AdminApplicationDetail {
   availability: string;
   expectedSalary: string;
   whyThisRole: string;
+  screeningAnswers: { question: string; answer: string }[];
 
   scorecard: Scorecard;
   internalNote: string;

@@ -21,6 +21,7 @@ function stubJob(overrides: Pick<Job, "id" | "companyName" | "title">): Job {
     responsibilities: [],
     requirements: [],
     skills: [],
+    screeningQuestions: [],
     ...overrides,
   };
 }

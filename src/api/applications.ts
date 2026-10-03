@@ -17,12 +17,13 @@ export type ApplicationDraft = {
   availability: string;
   expectedSalary: string;
   whyThisRole: string;
+  screeningAnswers: { question: string; answer: string }[];
 };
 
 // The profile fields we use to fill the wizard in for the candidate.
 export type ApplicationPrefill = Omit<
   ApplicationDraft,
-  "expectedSalary" | "whyThisRole"
+  "expectedSalary" | "whyThisRole" | "screeningAnswers"
 >;
 
 // ---------------------------------------------------------------------------

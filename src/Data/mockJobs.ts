@@ -33,6 +33,7 @@ export const mockJobs: Job[] = [
       "Experience in a fast-shipping product team",
     ],
     skills: ["React", "TypeScript", "Accessibility", "Testing", "Performance"],
+    screeningQuestions: [],
   },
   {
     id: "2",
@@ -64,6 +65,7 @@ export const mockJobs: Job[] = [
       "Available for a six-month placement",
     ],
     skills: ["Copywriting", "Social Media", "Analytics", "Research"],
+    screeningQuestions: [],
   },
   {
     id: "3",
@@ -96,6 +98,7 @@ export const mockJobs: Job[] = [
       "Fluent in Figma and design systems thinking",
     ],
     skills: ["Figma", "Design Systems", "User Research", "Prototyping"],
+    screeningQuestions: [],
   },
   {
     id: "4",
@@ -127,6 +130,7 @@ export const mockJobs: Job[] = [
       "Motion or illustration skills are a plus",
     ],
     skills: ["Brand Identity", "Figma", "Illustration", "Motion"],
+    screeningQuestions: [],
   },
   {
     id: "5",
@@ -158,6 +162,7 @@ export const mockJobs: Job[] = [
       "Comfortable working onsite in Lagos",
     ],
     skills: ["Team Leadership", "Support Tools", "Reporting", "Escalations"],
+    screeningQuestions: [],
   },
   {
     id: "6",
@@ -189,6 +194,7 @@ export const mockJobs: Job[] = [
       "Curious about personal finance",
     ],
     skills: ["SQL", "Python", "Dashboards", "Statistics"],
+    screeningQuestions: [],
   },
   {
     id: "7",
@@ -220,6 +226,7 @@ export const mockJobs: Job[] = [
       "Payments or fintech background is a plus",
     ],
     skills: ["Go", "PostgreSQL", "Kubernetes", "Redis", "gRPC"],
+    screeningQuestions: [],
   },
   {
     id: "8",
@@ -251,5 +258,6 @@ export const mockJobs: Job[] = [
       "Organised and reliable with scheduling",
     ],
     skills: ["User Interviews", "Note-taking", "Synthesis", "Figma"],
+    screeningQuestions: [],
   },
 ];

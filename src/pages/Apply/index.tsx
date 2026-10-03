@@ -47,6 +47,7 @@ const emptyDraft: ApplicationDraft = {
   availability: "",
   expectedSalary: "",
   whyThisRole: "",
+  screeningAnswers: [],
 };
 
 const inputClass =
@@ -54,6 +55,22 @@ const inputClass =
 
 const labelClass =
   "mb-[7px] block font-['Inter'] font-medium text-[13px] text-[#4B4757]";
+
+// Swaps the border color wholesale rather than appending a second border
+// class alongside it — two border-color utilities on one element race each
+// other in the generated CSS, so only one variant of the string is ever used.
+function fieldClass(hasError: boolean): string {
+  return hasError
+    ? inputClass
+        .replace("border-[#ECEBF0]", "border-[#D14343]")
+        .replace("focus:border-[#6D4AFF]", "focus:border-[#D14343]")
+    : inputClass;
+}
+
+function FieldError({ message }: { message?: string }) {
+  if (!message) return null;
+  return <p className="mt-[6px] font-['Inter'] text-[12px] text-[#D14343]">{message}</p>;
+}
 
 const Apply = () => {
   const { jobId } = useParams<{ jobId: string }>();
@@ -80,6 +97,11 @@ const Apply = () => {
   const [submitting, setSubmitting] = useState(false);
   const [uploadingCv, setUploadingCv] = useState(false);
 
+  // Field-level messages, set when "Continue" is blocked — cleared as each
+  // field is fixed. Keyed loosely since step 2's screening answers aren't a
+  // fixed set of names.
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
   // Set once the application goes through — swaps the whole page for the
   // success screen.
   const [submittedId, setSubmittedId] = useState<string | null>(null);
@@ -91,6 +113,31 @@ const Apply = () => {
     value: ApplicationDraft[K]
   ) {
     setDraft((prev) => ({ ...prev, [key]: value }));
+    if (errors[key as string]) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next[key as string];
+        return next;
+      });
+    }
+  }
+
+  function updateScreeningAnswer(index: number, answer: string) {
+    setDraft((prev) => ({
+      ...prev,
+      screeningAnswers: prev.screeningAnswers.map((entry, i) =>
+        i === index ? { ...entry, answer } : entry
+      ),
+    }));
+
+    const errorKey = `screening-${index}`;
+    if (errors[errorKey]) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next[errorKey];
+        return next;
+      });
+    }
   }
 
   // Load the job, and — only for a logged-in candidate — the profile
@@ -123,6 +170,14 @@ const Apply = () => {
 
         setJob(jobData);
 
+        // One empty answer slot per question the job actually asks — most
+        // jobs have none, in which case this is just an empty array and
+        // nothing new renders.
+        const screeningAnswers = jobData.screeningQuestions.map((question) => ({
+          question,
+          answer: "",
+        }));
+
         if (prefill) {
           setDraft((prev) => ({
             ...prev,
@@ -130,12 +185,17 @@ const Apply = () => {
             // Default the salary field to the job's own range, as a starting
             // point the candidate can edit.
             expectedSalary: formatRange(jobData),
+            screeningAnswers,
           }));
 
           // If we got a name and email back, step 1 is already filled in.
           setPrefilled(Boolean(prefill.fullName && prefill.email));
         } else {
-          setDraft((prev) => ({ ...prev, expectedSalary: formatRange(jobData) }));
+          setDraft((prev) => ({
+            ...prev,
+            expectedSalary: formatRange(jobData),
+            screeningAnswers,
+          }));
         }
       } catch {
         if (!cancelled) toast.error("Could not open the application");
@@ -184,21 +244,34 @@ const Apply = () => {
     }
   }
 
-  // Each step decides for itself whether you're allowed to continue.
-  function canContinue(): boolean {
+  // Each step decides for itself what's required, and builds its own
+  // field-level error messages when something's missing.
+  function stepErrors(): Record<string, string> {
     if (step === 0) {
-      return Boolean(draft.fullName.trim() && draft.email.trim());
+      const next: Record<string, string> = {};
+      if (!draft.fullName.trim()) next.fullName = "Full name is required";
+      if (!draft.email.trim()) next.email = "Email is required";
+      return next;
     }
     if (step === 2) {
-      return Boolean(draft.whyThisRole.trim());
+      const next: Record<string, string> = {};
+      if (!draft.whyThisRole.trim()) {
+        next.whyThisRole = "Tell us why you're interested in this role";
+      }
+      draft.screeningAnswers.forEach((entry, index) => {
+        if (!entry.answer.trim()) next[`screening-${index}`] = "This question needs an answer";
+      });
+      return next;
     }
-    return true;
+    return {};
   }
 
   function goNext() {
-    if (!canContinue()) {
-      if (step === 0) toast.error("Name and email are required");
-      if (step === 2) toast.error("Tell us why you're interested in this role");
+    const nextErrors = stepErrors();
+    setErrors(nextErrors);
+
+    if (Object.keys(nextErrors).length > 0) {
+      toast.error(Object.values(nextErrors)[0]);
       return;
     }
 
@@ -276,10 +349,11 @@ const Apply = () => {
               <div>
                 <label className={labelClass}>Full name</label>
                 <input
-                  className={inputClass}
+                  className={fieldClass(Boolean(errors.fullName))}
                   value={draft.fullName}
                   onChange={(e) => update("fullName", e.target.value)}
                 />
+                <FieldError message={errors.fullName} />
               </div>
 
               <div className="flex flex-col gap-[16px] sm:flex-row">
@@ -287,10 +361,11 @@ const Apply = () => {
                   <label className={labelClass}>Email</label>
                   <input
                     type="email"
-                    className={inputClass}
+                    className={fieldClass(Boolean(errors.email))}
                     value={draft.email}
                     onChange={(e) => update("email", e.target.value)}
                   />
+                  <FieldError message={errors.email} />
                 </div>
                 <div className="flex-1">
                   <label className={labelClass}>Phone</label>
@@ -458,13 +533,39 @@ const Apply = () => {
                   placeholder="A sentence or two on why you're a strong fit."
                   value={draft.whyThisRole}
                   onChange={(e) => update("whyThisRole", e.target.value)}
-                  className="w-full rounded-[12px] border-[1.05px] border-[#ECEBF0] bg-white p-[15px] font-['Inter'] text-[14px] leading-[22px] text-[#161320] outline-none transition placeholder:text-[#8B8798] focus:border-[#6D4AFF]"
+                  className={`w-full rounded-[12px] border-[1.05px] bg-white p-[15px] font-['Inter'] text-[14px] leading-[22px] text-[#161320] outline-none transition placeholder:text-[#8B8798] ${
+                    errors.whyThisRole
+                      ? "border-[#D14343] focus:border-[#D14343]"
+                      : "border-[#ECEBF0] focus:border-[#6D4AFF]"
+                  }`}
                 />
                 {/* A live character count, so nobody hits the limit blind */}
                 <div className="mt-[4px] text-right font-['Inter'] text-[11px] text-[#8B8798]">
                   {draft.whyThisRole.length} / 600
                 </div>
+                <FieldError message={errors.whyThisRole} />
               </div>
+
+              {/* This job's own screening questions, if it has any — set
+                  by whoever posted it, so most jobs show nothing here. */}
+              {draft.screeningAnswers.map((entry, index) => (
+                <div key={index}>
+                  <label className={labelClass}>
+                    {entry.question} <span className="text-[#D14343]">*</span>
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={entry.answer}
+                    onChange={(e) => updateScreeningAnswer(index, e.target.value)}
+                    className={`w-full rounded-[12px] border-[1.05px] bg-white p-[15px] font-['Inter'] text-[14px] leading-[22px] text-[#161320] outline-none transition placeholder:text-[#8B8798] ${
+                      errors[`screening-${index}`]
+                        ? "border-[#D14343] focus:border-[#D14343]"
+                        : "border-[#ECEBF0] focus:border-[#6D4AFF]"
+                    }`}
+                  />
+                  <FieldError message={errors[`screening-${index}`]} />
+                </div>
+              ))}
             </div>
           </>
         )}
@@ -511,6 +612,16 @@ const Apply = () => {
                   ["Why this role", draft.whyThisRole],
                 ]}
               />
+
+              {draft.screeningAnswers.length > 0 && (
+                <ReviewCard
+                  title="Screening questions"
+                  onEdit={() => setStep(2)}
+                  rows={draft.screeningAnswers.map(
+                    (entry): [string, string] => [entry.question, entry.answer]
+                  )}
+                />
+              )}
 
               {/* The promise the whole product is built on */}
               <div className="rounded-[16px] bg-[#140A28] p-5">
