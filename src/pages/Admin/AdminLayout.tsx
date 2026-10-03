@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   FiGrid,
   FiBriefcase,
@@ -11,6 +11,8 @@ import {
   FiSearch,
   FiPlus,
   FiLogOut,
+  FiMenu,
+  FiX,
 } from "react-icons/fi";
 import Logo from "../../components/Logo";
 import { useAuth } from "../../context/AuthContext";
@@ -42,10 +44,16 @@ function initials(name: string): string {
 
 const AdminLayout = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const [overview, setOverview] = useState<DashboardOverview | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  // The sidebar is part of the flex row on large screens, but becomes a
+  // slide-in drawer below lg — closed by default so it doesn't cover the
+  // page on first load.
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
     fetchDashboardOverview()
@@ -75,6 +83,7 @@ const AdminLayout = () => {
         key={item.to}
         to={item.to}
         end={item.to === "/admin"}
+        onClick={() => setMobileNavOpen(false)}
         className={({ isActive }) =>
           `flex items-center justify-between rounded-[10px] px-[12px] py-[9px] font-['Inter'] text-[14px] font-medium transition-colors ${
             isActive
@@ -96,13 +105,38 @@ const AdminLayout = () => {
 
   return (
     <div className="flex min-h-screen bg-[#FAFAFB]">
+      {/* Backdrop behind the mobile drawer — tapping it closes the menu,
+          same as the X button or a nav link. Hidden entirely at lg, where
+          the sidebar is always part of the layout instead of an overlay. */}
+      {mobileNavOpen && (
+        <div
+          onClick={() => setMobileNavOpen(false)}
+          aria-hidden="true"
+          className="fixed inset-0 z-40 bg-[#161320]/30 lg:hidden"
+        />
+      )}
+
       {/* ---------------- sidebar ---------------- */}
-      <aside className="flex w-[260px] shrink-0 flex-col border-r-[1.07px] border-r-[#ECEBF0] bg-white px-[20px] py-[24px]">
-        <div className="mb-[32px] flex items-center gap-[10px] px-[4px]">
-          <Logo width={120} />
-          <span className="rounded-[6px] bg-[#F1EDFF] px-[8px] py-[3px] font-['Inter'] text-[10.5px] font-bold tracking-[0.04em] text-[#6D4AFF]">
-            ADMIN
-          </span>
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 flex w-[260px] shrink-0 flex-col border-r-[1.07px] border-r-[#ECEBF0] bg-white px-[20px] py-[24px] transition-transform duration-200 ease-in-out lg:static lg:z-auto lg:translate-x-0 ${
+          mobileNavOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="mb-[32px] flex items-center justify-between gap-[10px] px-[4px]">
+          <div className="flex items-center gap-[10px]">
+            <Logo width={120} />
+            <span className="rounded-[6px] bg-[#F1EDFF] px-[8px] py-[3px] font-['Inter'] text-[10.5px] font-bold tracking-[0.04em] text-[#6D4AFF]">
+              ADMIN
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setMobileNavOpen(false)}
+            aria-label="Close menu"
+            className="flex size-[30px] shrink-0 items-center justify-center rounded-[8px] text-[#8B8798] hover:bg-[#FAFAFB] lg:hidden"
+          >
+            <FiX className="size-[18px]" />
+          </button>
         </div>
 
         <nav className="flex flex-1 flex-col gap-[22px] overflow-y-auto">
@@ -155,8 +189,19 @@ const AdminLayout = () => {
 
       {/* ---------------- main column ---------------- */}
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center gap-[16px] border-b-[1.07px] border-b-[#ECEBF0] bg-white px-[32px] py-[16px]">
-          <div className="flex flex-1 items-center gap-[10px] rounded-full bg-[#FAFAFB] px-[16px] py-[9px]">
+        <header className="flex items-center gap-[12px] border-b-[1.07px] border-b-[#ECEBF0] bg-white px-[16px] py-[14px] sm:gap-[16px] sm:px-[24px] lg:px-[32px] lg:py-[16px]">
+          <button
+            type="button"
+            onClick={() => setMobileNavOpen(true)}
+            aria-label="Open menu"
+            className="flex size-[38px] shrink-0 items-center justify-center rounded-full border-[1.07px] border-[#ECEBF0] text-[#4B4757] hover:bg-[#FAFAFB] lg:hidden"
+          >
+            <FiMenu className="size-[17px]" />
+          </button>
+
+          {/* Not yet wired to anything — hidden below sm so it doesn't
+              crowd out the buttons on a phone-width header. */}
+          <div className="hidden flex-1 items-center gap-[10px] rounded-full bg-[#FAFAFB] px-[16px] py-[9px] sm:flex">
             <FiSearch className="size-[16px] shrink-0 text-[#8B8798]" />
             <input
               type="text"
@@ -164,6 +209,7 @@ const AdminLayout = () => {
               className="w-full min-w-0 bg-transparent font-['Inter'] text-[13.5px] text-[#161320] outline-none placeholder:text-[#8B8798]"
             />
           </div>
+          <div className="flex-1 sm:hidden" />
 
           <button
             type="button"
@@ -175,14 +221,15 @@ const AdminLayout = () => {
 
           <button
             type="button"
-            className="flex shrink-0 items-center gap-[8px] rounded-[10px] bg-[#6D4AFF] px-[16px] py-[10px] font-['Inter'] text-[13.5px] font-semibold text-white hover:bg-[#5D3CE0]"
+            onClick={() => navigate("/admin/jobs/new")}
+            className="flex shrink-0 items-center gap-[8px] rounded-[10px] bg-[#6D4AFF] px-[12px] py-[10px] font-['Inter'] text-[13.5px] font-semibold text-white hover:bg-[#5D3CE0] sm:px-[16px]"
           >
             <FiPlus className="size-[15px]" />
-            New job
+            <span className="hidden sm:inline">New job</span>
           </button>
         </header>
 
-        <main className="flex-1 px-[32px] py-[28px]">
+        <main className="flex-1 px-[16px] py-[20px] sm:px-[24px] sm:py-[24px] lg:px-[32px] lg:py-[28px]">
           <Outlet context={{ overview, loading, error } satisfies AdminOutletContext} />
         </main>
       </div>

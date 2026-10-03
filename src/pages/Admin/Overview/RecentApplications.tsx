@@ -37,8 +37,8 @@ const RecentApplications = ({ applications }: RecentApplicationsProps) => {
           No applications yet.
         </p>
       ) : (
-        <>
-          <div className="grid grid-cols-[1fr_1fr_auto_auto_auto] gap-[12px] border-b-[1.07px] border-b-[#ECEBF0] pb-[10px] font-['Inter'] text-[11px] font-semibold tracking-[0.06em] text-[#8B8798]">
+        <div className="overflow-x-auto">
+          <div className="grid min-w-[560px] grid-cols-[1fr_1fr_auto_auto_auto] gap-[12px] border-b-[1.07px] border-b-[#ECEBF0] pb-[10px] font-['Inter'] text-[11px] font-semibold tracking-[0.06em] text-[#8B8798]">
             <span>CANDIDATE</span>
             <span>ROLE</span>
             <span>STATUS</span>
@@ -46,7 +46,7 @@ const RecentApplications = ({ applications }: RecentApplicationsProps) => {
             <span></span>
           </div>
 
-          <div className="flex flex-col">
+          <div className="flex min-w-[560px] flex-col">
             {applications.map((app) => {
               const config = APPLICATION_STATUS_CONFIG[app.status];
               return (
@@ -99,7 +99,7 @@ const RecentApplications = ({ applications }: RecentApplicationsProps) => {
               );
             })}
           </div>
-        </>
+        </div>
       )}
     </div>
   );
