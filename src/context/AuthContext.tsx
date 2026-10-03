@@ -5,6 +5,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import axios from "axios";
 import {
   loginRequest,
   registerRequest,
@@ -33,6 +34,14 @@ type AuthContextType = {
   loading: boolean; // true while we check the saved token on first load
   login: (email: string, password: string) => Promise<void>;
 
+  // True when the on-load "is this token still good?" check couldn't get a
+  // definitive answer (dropped connection, a cold-starting backend) rather
+  // than being told outright that the token is invalid. ProtectedRoute uses
+  // this to offer a retry instead of bouncing someone to /login who may well
+  // still be logged in.
+  sessionCheckFailed: boolean;
+  retrySessionCheck: () => void;
+
   // Creates the account and emails a code. Does NOT log you in — that
   // happens in verifyEmail below.
   register: (name: string, email: string, password: string) => Promise<void>;
@@ -59,13 +68,19 @@ type AuthProviderProps = {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [sessionCheckFailed, setSessionCheckFailed] = useState(false);
 
-  // Runs once when the app starts.
-  //
   // The token lives in localStorage, so it survives a refresh. But it might
   // have expired since last time, so we ask the server "is this still valid,
   // and who is it?" before trusting it.
-  useEffect(() => {
+  //
+  // On mobile especially, this check can fail for reasons that have nothing
+  // to do with the token itself — a dropped connection, a free-tier backend
+  // cold-starting — so only a real 401 (the server explicitly rejecting the
+  // token) counts as "log this person out". Anything else gets a few retries
+  // before we give up, and even then we keep the token and just flag that we
+  // couldn't confirm it, instead of silently wiping a still-valid session.
+  async function checkSession() {
     const token = getToken();
 
     if (!token) {
@@ -73,11 +88,43 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       return;
     }
 
-    getMeRequest(token)
-      .then((data) => setUser(data.user))
-      .catch(() => clearToken()) // expired or invalid — throw it away
-      .finally(() => setLoading(false));
+    setSessionCheckFailed(false);
+
+    const MAX_ATTEMPTS = 3;
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      try {
+        const data = await getMeRequest(token);
+        setUser(data.user);
+        setLoading(false);
+        return;
+      } catch (err) {
+        const status = axios.isAxiosError(err) ? err.response?.status : undefined;
+
+        if (status === 401) {
+          clearToken();
+          setLoading(false);
+          return;
+        }
+
+        if (attempt < MAX_ATTEMPTS) {
+          await new Promise((resolve) => setTimeout(resolve, attempt * 1500));
+        }
+      }
+    }
+
+    setSessionCheckFailed(true);
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    checkSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  function retrySessionCheck() {
+    setLoading(true);
+    checkSession();
+  }
 
   async function login(email: string, password: string) {
     const data = await loginRequest(email, password);
@@ -112,6 +159,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     user,
     isLoggedIn: user !== null,
     loading,
+    sessionCheckFailed,
+    retrySessionCheck,
     login,
     register,
     verifyEmail,

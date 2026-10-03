@@ -212,14 +212,16 @@ export async function resetPasswordRequest(
 //
 // This is how we check on page load whether the saved token is still good.
 // Notice the Authorization header — that is the token being sent back.
+//
+// Deliberately NOT wrapped in try/catch like the requests above: AuthContext
+// needs the raw axios error (specifically err.response?.status) to tell "the
+// server rejected this token" (401) apart from "couldn't reach the server
+// right now" (a dropped connection, the backend cold-starting) — only the
+// first of those should ever log someone out.
 // ---------------------------------------------------------------------------
 export async function getMeRequest(token: string): Promise<{ user: User }> {
-  try {
-    const res = await apiClient.get<{ user: User }>("/auth/me", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return res.data;
-  } catch (err) {
-    throw new Error(extractError(err, "Session expired"));
-  }
+  const res = await apiClient.get<{ user: User }>("/auth/me", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
 }
