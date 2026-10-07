@@ -10,15 +10,7 @@ type ApplySubmittedProps = {
   applicationId: string;
 };
 
-// ---------------------------------------------------------------------------
-// Shown once the application actually goes through.
-//
-// The stepper here is the SAME component the Applications page uses, fed the
-// same stage list — so what someone sees the moment they submit matches what
-// they'll see when they come back to check on it later.
-// ---------------------------------------------------------------------------
 const ApplySubmitted = ({ job, applicationId }: ApplySubmittedProps) => {
-  // Where the review sits on the line right now. Index 1 is "review".
   const currentStageIndex = 1;
 
   return (
@@ -36,8 +28,6 @@ const ApplySubmitted = ({ job, applicationId }: ApplySubmittedProps) => {
 
       <div className="mx-auto w-full max-w-[600px] px-4 pb-24 pt-[60px] sm:px-6">
         <div className="rounded-[24px] border-[1.07px] border-[#ECEBF0] bg-white p-8 text-center sm:p-[44px]">
-          {/* Green tick — the one place green earns its place, because
-              "it worked" is exactly what it needs to say. */}
           <div className="mx-auto flex h-[62px] w-[62px] items-center justify-center rounded-full bg-[#E9F9EF]">
             <FiCheck size={28} className="text-[#1F9254]" />
           </div>
@@ -66,8 +56,6 @@ const ApplySubmitted = ({ job, applicationId }: ApplySubmittedProps) => {
           <div className="mt-[36px] flex flex-col items-center justify-center gap-[12px] sm:flex-row">
             <NavLink
               to="/applications"
-              // The id isn't used for routing yet, but it's what we'd use to
-              // deep-link to this one application later.
               state={{ applicationId }}
               className="w-full rounded-full bg-[#6D4AFF] px-[28px] py-[13px] text-center font-['Inter'] font-semibold text-[13.5px] text-white shadow-[0px_8px_22px_0px_rgba(109,74,255,0.3)] sm:w-auto"
             >

@@ -1,7 +1,5 @@
 import JobCard from "../../components/JobCard";
 import { mockJobs } from "../../Data/mockJobs";
-// TODO: swap mockJobs for a real fetch (e.g. useEffect + api/jobs.ts) once the backend endpoint exists.
-// Keep the variable named `jobs` so the swap is a one-line change.
 
 const OpenThisWeek = () => {
   const jobs = mockJobs.slice(0, 6);

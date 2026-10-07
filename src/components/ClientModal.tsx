@@ -31,9 +31,6 @@ const EMPTY_FORM: ClientPayload = {
   logoUrl: "",
 };
 
-// Shared by the Clients list page ("New client" / its edit-pencil) and the
-// Client detail page ("Edit") — one modal, same validation and upload flow
-// everywhere a client gets created or edited.
 export default function ClientModal({
   initial,
   onClose,
@@ -73,7 +70,7 @@ export default function ClientModal({
 
   async function handleLogoChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    e.target.value = ""; // lets picking the same file again still fire onChange
+    e.target.value = "";
     if (!file) return;
 
     setUploadingLogo(true);

@@ -19,9 +19,6 @@ import { useAuth } from "../../context/AuthContext";
 import { fetchDashboardOverview } from "../../api/dashboard";
 import type { DashboardOverview } from "../../types/dashboard";
 
-// Shared with every nested admin page via <Outlet context={...} />, so the
-// dashboard data is fetched exactly once here — the sidebar's badge counts
-// and the Overview page's widgets both come from the same response.
 export interface AdminOutletContext {
   overview: DashboardOverview | null;
   loading: boolean;
@@ -50,9 +47,6 @@ const AdminLayout = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // The sidebar is part of the flex row on large screens, but becomes a
-  // slide-in drawer below lg — closed by default so it doesn't cover the
-  // page on first load.
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
@@ -105,9 +99,6 @@ const AdminLayout = () => {
 
   return (
     <div className="flex min-h-screen bg-[#FAFAFB]">
-      {/* Backdrop behind the mobile drawer — tapping it closes the menu,
-          same as the X button or a nav link. Hidden entirely at lg, where
-          the sidebar is always part of the layout instead of an overlay. */}
       {mobileNavOpen && (
         <div
           onClick={() => setMobileNavOpen(false)}
@@ -116,7 +107,6 @@ const AdminLayout = () => {
         />
       )}
 
-      {/* ---------------- sidebar ---------------- */}
       <aside
         className={`fixed inset-y-0 left-0 z-50 flex w-[260px] shrink-0 flex-col border-r-[1.07px] border-r-[#ECEBF0] bg-white px-[20px] py-[24px] transition-transform duration-200 ease-in-out lg:static lg:z-auto lg:translate-x-0 ${
           mobileNavOpen ? "translate-x-0" : "-translate-x-full"
@@ -187,7 +177,6 @@ const AdminLayout = () => {
         )}
       </aside>
 
-      {/* ---------------- main column ---------------- */}
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex items-center gap-[12px] border-b-[1.07px] border-b-[#ECEBF0] bg-white px-[16px] py-[14px] sm:gap-[16px] sm:px-[24px] lg:px-[32px] lg:py-[16px]">
           <button
@@ -199,8 +188,6 @@ const AdminLayout = () => {
             <FiMenu className="size-[17px]" />
           </button>
 
-          {/* Not yet wired to anything — hidden below sm so it doesn't
-              crowd out the buttons on a phone-width header. */}
           <div className="hidden flex-1 items-center gap-[10px] rounded-full bg-[#FAFAFB] px-[16px] py-[9px] sm:flex">
             <FiSearch className="size-[16px] shrink-0 text-[#8B8798]" />
             <input

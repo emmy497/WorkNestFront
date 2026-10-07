@@ -15,7 +15,6 @@ const formatSalary = (amount: number, currency: string) =>
     : `${currency}${Math.round(amount / 1000)}k`;
 
 const JobDetails = () => {
-  // Reads the ":jobId" part of the URL, e.g. /job-details/6a94cf...
   const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
   const { isLoggedIn } = useAuth();
@@ -24,8 +23,6 @@ const JobDetails = () => {
   const [loading, setLoading] = useState(true);
   const [showApplyGate, setShowApplyGate] = useState(false);
 
-  // Logged in — go straight to the wizard, same as always. Logged out —
-  // show the modal instead of the ProtectedRoute redirect this used to be.
   function handleApplyClick() {
     if (isLoggedIn) {
       navigate(`/apply/${jobId}`);
@@ -34,9 +31,6 @@ const JobDetails = () => {
     }
   }
 
-  // Runs on load, AND again whenever jobId changes — because [jobId] is the
-  // dependency array. Without jobId in there, clicking a different job would
-  // keep showing the old one.
   useEffect(() => {
     if (!jobId) return;
 
@@ -130,7 +124,6 @@ const JobDetails = () => {
       <div className="px-4 sm:px-8 md:px-16 lg:px-[100px]">
         <Navbar />
 
-        {/* Back link */}
         <NavLink
           to="/find-jobs"
           className="mt-10 lg:mt-[52px] inline-flex items-center gap-[7px] font-['Inter'] text-[13px] text-[#8B8798] transition hover:text-[#161320]"
@@ -139,7 +132,6 @@ const JobDetails = () => {
           Back to all roles
         </NavLink>
 
-        {/* Hero */}
         <div className="mt-4 lg:mt-[18px] rounded-[24px] bg-[#F2EEFF] p-6 lg:p-[32px]">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="flex gap-[12px]">
@@ -190,9 +182,7 @@ const JobDetails = () => {
           </div>
         </div>
 
-        {/* Body */}
         <div className="mt-8 lg:mt-[40px] mb-24 lg:mb-[120px] flex flex-col lg:flex-row gap-8 lg:gap-[48px]">
-          {/* Left column */}
           <div className="min-w-0 flex-1">
             <h2 className="font-['Bricolage_Grotesque'] font-bold text-[20px] leading-[30px] tracking-[-0.4px] text-[#161320]">
               About the role
@@ -244,7 +234,6 @@ const JobDetails = () => {
             </div>
           </div>
 
-          {/* Right sidebar */}
           <aside className="w-full lg:w-[268px] lg:shrink-0 flex flex-col gap-4 lg:gap-[18px]">
             <div className="rounded-[20px] border-[1.07px] border-[#ECEBF0] bg-white p-5 lg:p-[22px] shadow-[0px_1.07px_3.2px_0px_#1613200F,0px_1.07px_2.13px_0px_#1613200D]">
               <div className="font-['Bricolage_Grotesque'] font-bold text-[21px] leading-[30px] tracking-[-0.4px] text-[#161320]">
@@ -292,7 +281,6 @@ const JobDetails = () => {
               </div>
             </div>
 
-            {/* Why this could fit */}
             <div className="rounded-[20px] border-[1.07px] border-[#FFE7A3] bg-[#FFFCF2] p-5">
               <span className="inline-block rounded-full bg-[#FFC93C] px-[10px] py-[4px] font-['Inter'] font-semibold text-[9.5px] tracking-[0.6px] uppercase text-[#463400]">
                 Why this could fit
@@ -308,7 +296,6 @@ const JobDetails = () => {
               </div>
             </div>
 
-            {/* Reviewed by a human */}
             <div className="rounded-[20px] bg-[#140A28] p-5">
               <span className="font-['Inter'] font-semibold text-[9.5px] tracking-[0.6px] uppercase text-[#FFC93C]">
                 Reviewed by a human

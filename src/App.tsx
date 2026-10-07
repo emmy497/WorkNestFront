@@ -33,9 +33,6 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/find-jobs" element={<FindJobs />} />
         <Route path="/job-details/:jobId" element={<JobDetails />} />
-        {/* No ProtectedRoute here — a guest can apply without an account.
-            The gate is the ApplyGateModal shown from JobDetails, not the
-            route itself. */}
         <Route path="/apply/:jobId" element={<Apply />} />
         <Route
           path="/profile"
@@ -62,13 +59,8 @@ function App() {
           }
         />
 
-        {/* The dashboard lives at /admin. This is just a friendly alias so
-            /dashboard doesn't land on a blank page. */}
         <Route path="/dashboard" element={<Navigate to="/admin" replace />} />
 
-        {/* The admin dashboard. allowedRoles means a logged-in CANDIDATE
-            gets bounced home — being signed in isn't enough here. The real
-            guard is authorize() on the server; this just matches it. */}
         <Route
           path="/admin"
           element={
@@ -82,9 +74,6 @@ function App() {
           <Route path="jobs/new" element={<JobEditor />} />
           <Route path="clients" element={<Clients />} />
           <Route path="clients/:id" element={<ClientDetail />} />
-          {/* Both routes render the same Pipeline component — the review
-              screen is a slide-over inside it, not a separate page, so the
-              list underneath must never unmount when :id shows up. */}
           <Route path="pipeline" element={<Pipeline />} />
           <Route path="pipeline/:id" element={<Pipeline />} />
         </Route>

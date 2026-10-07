@@ -5,8 +5,6 @@ import type { ClientDetail as ClientDetailType, ClientListItem, JobStatus } from
 import { fetchClientDetail } from "../../api/adminCompanies";
 import ClientModal from "../../components/ClientModal";
 
-// Same palette/hash idea as Jobs.tsx and Clients.tsx — a client or job row
-// without a logo always gets the same color square across reloads.
 const AVATAR_COLORS = ["#161320", "#2D5BFF", "#6D4AFF", "#1E9E5A", "#C2760C", "#D9651B"];
 
 function avatarColor(name: string): string {
@@ -17,8 +15,6 @@ function avatarColor(name: string): string {
   return AVATAR_COLORS[Math.abs(hash)];
 }
 
-// Same mapping Jobs.tsx uses — "open" reads as "Published" everywhere in
-// this admin UI.
 const STATUS_CONFIG: Record<JobStatus, { label: string; dot: string; badgeBg: string; badgeText: string }> = {
   open: { label: "Published", dot: "#1E9E5A", badgeBg: "#E9F9F0", badgeText: "#127A3E" },
   draft: { label: "Draft", dot: "#C2760C", badgeBg: "#FFF1DE", badgeText: "#8A5A12" },
@@ -89,7 +85,6 @@ const ClientDetail = () => {
         Back to clients
       </NavLink>
 
-      {/* header card */}
       <div className="mb-[20px] rounded-[16px] border-[1.07px] border-[#ECEBF0] bg-white p-[22px] sm:p-[26px]">
         <div className="flex flex-wrap items-start justify-between gap-[16px]">
           <div className="flex items-start gap-[16px]">
@@ -166,7 +161,6 @@ const ClientDetail = () => {
         </div>
       </div>
 
-      {/* stats */}
       <div className="mb-[20px] grid grid-cols-1 gap-[16px] sm:grid-cols-3">
         <div className="rounded-[16px] border-[1.07px] border-[#ECEBF0] bg-white p-[20px]">
           <div className="font-['Bricolage_Grotesque'] font-extrabold text-[28px] text-[#161320]">
@@ -188,7 +182,6 @@ const ClientDetail = () => {
         </div>
       </div>
 
-      {/* roles */}
       <div className="rounded-[16px] border-[1.07px] border-[#ECEBF0] bg-white p-[22px]">
         <div className="mb-[16px] flex items-center justify-between">
           <h2 className="font-['Bricolage_Grotesque'] font-bold text-[17px] text-[#161320]">

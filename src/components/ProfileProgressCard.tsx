@@ -13,8 +13,6 @@ const ProfileProgressCard = ({ profile }: ProfileProgressCardProps) => {
   const sections = getProfileSections(profile);
   const percent = getProfileCompletionPercent(profile);
 
-  // An SVG ring drawn with stroke-dasharray, so the "filled" portion is
-  // just `percent` of the circle's circumference.
   const radius = 42;
   const circumference = 2 * Math.PI * radius;
   const filled = (percent / 100) * circumference;

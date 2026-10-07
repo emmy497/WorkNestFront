@@ -25,7 +25,6 @@ export interface Job {
   closesInDays: number;
   featured?: boolean;
 
-  // Detail page only
   responsibilities: string[];
   requirements: string[];
   skills: string[];
@@ -34,12 +33,6 @@ export interface Job {
   whyThisCouldFit: string;
 }
 
-// ---------------------------------------------------------------------------
-// Admin-only shapes — everything below is only ever returned to an admin or
-// recruiter (see server/src/controllers/adminJobController.ts). Unlike Job
-// above, these expose the raw status instead of candidate-facing fields
-// like closesInDays/postedDaysAgo.
-// ---------------------------------------------------------------------------
 export type JobStatus = "draft" | "open" | "closed" | "archived";
 
 export interface AdminJobListItem {
@@ -49,20 +42,15 @@ export interface AdminJobListItem {
   jobType: JobType;
   status: JobStatus;
   applicantCount: number;
-  closesAt: string; // ISO date string
-  createdAt: string; // ISO date string
+  closesAt: string;
+  createdAt: string;
 }
 
-// A company as listed for the New Role form's "Client" dropdown — see
-// server/src/controllers/adminCompanyController.ts.
 export interface CompanyOption {
   id: string;
   name: string;
 }
 
-// A client card on the admin Clients page, including the two computed
-// stats (openRoles, placements) — see getClients in
-// server/src/controllers/adminCompanyController.ts.
 export interface ClientListItem {
   id: string;
   name: string;
@@ -75,7 +63,6 @@ export interface ClientListItem {
   placements: number;
 }
 
-// What the "New client" / "Edit client" form sends.
 export interface ClientPayload {
   name: string;
   industry: string;
@@ -85,7 +72,6 @@ export interface ClientPayload {
   logoUrl: string;
 }
 
-// One row of the "Roles for {client}" table on the Client detail page.
 export interface ClientJobRow {
   id: string;
   title: string;
@@ -93,16 +79,14 @@ export interface ClientJobRow {
   experienceLevel: ExperienceLevel;
   status: JobStatus;
   applicantCount: number;
-  closesAt: string; // ISO date string
+  closesAt: string;
 }
 
-// GET /api/admin/companies/clients/:id — the full Client detail page.
 export interface ClientDetail extends ClientListItem {
   totalApplicants: number;
   jobs: ClientJobRow[];
 }
 
-// What the New Role form sends to POST /api/admin/jobs.
 export interface CreateJobPayload {
   title: string;
   companyId: string;
@@ -118,7 +102,7 @@ export interface CreateJobPayload {
   salaryMin: number;
   salaryMax: number;
   numberOfPositions: number;
-  closesAt: string; // yyyy-mm-dd, from an <input type="date">
+  closesAt: string;
   screeningQuestions: string[];
   action: "draft" | "publish";
 }

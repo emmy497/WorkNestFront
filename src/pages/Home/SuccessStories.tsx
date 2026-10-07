@@ -4,7 +4,6 @@ const SuccessStories = () => {
   return (
     <section className="px-4 sm:px-8 md:px-16 lg:px-[100px] mt-24 lg:mt-[170px] mb-24 lg:mb-[175px]">
       <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
-        {/* Copy */}
         <div className="w-full flex-1 lg:my-auto">
           <div className="font-['Inter'] font-medium text-[12.64px] leading-[18.96px] tracking-[1.77px] align-middle uppercase text-[#6D4AFF] [leading-trim:none] mb-[16px]">
             The other side
@@ -29,7 +28,6 @@ const SuccessStories = () => {
           </div>
         </div>
 
-        {/* Photos — single column on mobile, two offset columns on desktop */}
         <div className="w-full flex-1 flex flex-col lg:flex-row gap-4 lg:gap-[16.12px]">
           <div className="flex flex-col gap-4 lg:gap-[16.12px]">
             <PhotoCard

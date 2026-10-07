@@ -8,8 +8,6 @@ interface PipelineSnapshotProps {
 
 const PipelineSnapshot = ({ pipeline }: PipelineSnapshotProps) => {
   const max = Math.max(1, ...pipeline.map((row) => row.count));
-  // A floor so a small count still renders a readable pill instead of a
-  // sliver too narrow to hold its own number.
   const MIN_WIDTH = 14;
 
   return (

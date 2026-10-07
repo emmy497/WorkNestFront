@@ -1,8 +1,6 @@
 import { NavLink } from "react-router-dom";
 import LogoLight from "./LogoLight";
 
-// Each link now carries the route it should go to, not just a label.
-// A few of these pages don't exist yet — those are left as "" until they do.
 const columns = [
   {
     title: "For candidates",
@@ -35,7 +33,6 @@ const Footer = () => {
   return (
     <footer className="mt-[120px] bg-[#140A28] px-4 sm:px-8 md:px-16 lg:px-[100px] pt-[40px] pb-[18px] lg:pt-[44px] lg:pb-[40px]">
       <div className="grid grid-cols-1 gap-[17px] sm:grid-cols-2 sm:gap-10 lg:grid-cols-[1.55fr_1fr_1fr_1fr] lg:gap-8">
-        {/* Brand */}
         <div className="mb-4 sm:mb-0">
          <LogoLight/>
 
@@ -45,7 +42,6 @@ const Footer = () => {
           </p>
         </div>
 
-        {/* Link columns */}
         {columns.map((column) => (
           <div key={column.title}>
             <div className="font-['Inter'] font-medium text-[10.5px] leading-[16px] tracking-[1.4px] uppercase text-[hsla(0,0%,100%,0.44)]">
@@ -68,7 +64,6 @@ const Footer = () => {
         ))}
       </div>
 
-      {/* Bottom bar */}
       <div className="mt-4 lg:mt-[46px] border-t border-[hsla(0,0%,100%,0.09)] pt-[28px]">
         <div className="flex flex-col items-start gap-[7px] sm:flex-row sm:items-center sm:justify-between sm:gap-3">
           <div className="font-['Inter'] font-normal text-[10.5px] leading-[16px] tracking-[1.2px] uppercase text-[hsla(0,0%,100%,0.4)]">

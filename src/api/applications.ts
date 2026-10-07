@@ -1,7 +1,6 @@
 import type { Application } from "../types/application";
 import apiClient, { extractError } from "../lib/apiClient";
 
-// Everything the wizard collects, sent as one request at the end.
 export type ApplicationDraft = {
   fullName: string;
   email: string;
@@ -20,15 +19,11 @@ export type ApplicationDraft = {
   screeningAnswers: { question: string; answer: string }[];
 };
 
-// The profile fields we use to fill the wizard in for the candidate.
 export type ApplicationPrefill = Omit<
   ApplicationDraft,
   "expectedSalary" | "whyThisRole" | "screeningAnswers"
 >;
 
-// ---------------------------------------------------------------------------
-// GET /api/applications
-// ---------------------------------------------------------------------------
 export async function fetchApplications(): Promise<Application[]> {
   try {
     const res = await apiClient.get<Application[]>('/applications');
@@ -38,12 +33,6 @@ export async function fetchApplications(): Promise<Application[]> {
   }
 }
 
-// ---------------------------------------------------------------------------
-// GET /api/applications/prefill
-//
-// Whatever we already know about the candidate, so step 1 and step 2 of the
-// wizard arrive already filled in.
-// ---------------------------------------------------------------------------
 export async function fetchApplicationPrefill(): Promise<ApplicationPrefill> {
   try {
     const res = await apiClient.get<ApplicationPrefill>('/applications/prefill');
@@ -53,12 +42,6 @@ export async function fetchApplicationPrefill(): Promise<ApplicationPrefill> {
   }
 }
 
-// ---------------------------------------------------------------------------
-// GET /api/applications/job/:jobId
-//
-// Checked before the wizard opens, so we don't let someone fill in four
-// steps only to be told at the end that they already applied.
-// ---------------------------------------------------------------------------
 export async function checkAlreadyApplied(
   jobId: string
 ): Promise<{ applied: boolean; applicationId: string | null }> {
@@ -70,9 +53,6 @@ export async function checkAlreadyApplied(
   }
 }
 
-// ---------------------------------------------------------------------------
-// POST /api/applications/:jobId
-// ---------------------------------------------------------------------------
 export async function submitApplication(
   jobId: string,
   draft: ApplicationDraft

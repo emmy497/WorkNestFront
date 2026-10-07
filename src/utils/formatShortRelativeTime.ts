@@ -1,6 +1,3 @@
-// A more granular sibling to formatRelativeTime — the admin dashboard shows
-// "2h ago" for very recent activity, where the applicant-facing Applications
-// page only ever needed day-level granularity ("today", "3 days ago").
 export function formatShortRelativeTime(isoDate: string): string {
   const then = new Date(isoDate).getTime();
   const now = Date.now();
@@ -20,7 +17,6 @@ export function formatShortRelativeTime(isoDate: string): string {
   return diffWeeks === 1 ? "1 week ago" : `${diffWeeks} weeks ago`;
 }
 
-// "3 days left" / "Closes today" / "Closed" for a deadline-style ISO date.
 export function formatDaysLeft(isoDate: string): string {
   const closes = new Date(isoDate).getTime();
   const now = Date.now();

@@ -9,8 +9,6 @@ type SaveJobButtonProps = {
   jobId: string;
   jobTitle: string;
 
-  // The card version is a small plain icon; the details page version sits
-  // in a white circle. Same behaviour, different clothing.
   variant?: "plain" | "circle";
 };
 
@@ -28,8 +26,6 @@ const SaveJobButton = ({
   const saved = isSaved(jobId);
 
   async function handleClick(e: MouseEvent<HTMLButtonElement>) {
-    // The job card is wrapped in a link. Without these two lines, tapping
-    // the bookmark would ALSO navigate to the job details page.
     e.preventDefault();
     e.stopPropagation();
 
@@ -61,16 +57,12 @@ const SaveJobButton = ({
       type="button"
       onClick={handleClick}
       disabled={busy}
-      // aria-pressed tells a screen reader this is a toggle and whether
-      // it's currently on, which a plain icon can't communicate.
       aria-pressed={saved}
       aria-label={saved ? `Remove ${jobTitle} from saved` : `Save ${jobTitle}`}
       className={`shrink-0 transition disabled:opacity-60 ${
         variant === "circle" ? circleClasses : "p-[2px]"
       } ${saved ? "text-[#6D4AFF]" : "text-[#8B8798] hover:text-[#6D4AFF]"}`}
     >
-      {/* Same icon either way — when saved we fill it in, which is what
-          makes the state obvious at a glance. */}
       <FiBookmark
         size={variant === "circle" ? 16 : 18}
         fill={saved ? "currentColor" : "none"}

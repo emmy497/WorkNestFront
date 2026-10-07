@@ -7,8 +7,6 @@ import { formatShortRelativeTime } from "../../utils/formatShortRelativeTime";
 
 type FilterTab = JobStatus | "all";
 
-// "open" reads as "Published" everywhere in this admin UI — the mockup never
-// says "open" anywhere.
 const STATUS_CONFIG: Record<JobStatus, { label: string; dot: string; badgeBg: string; badgeText: string }> = {
   open: { label: "Published", dot: "#1E9E5A", badgeBg: "#E9F9F0", badgeText: "#127A3E" },
   draft: { label: "Draft", dot: "#C2760C", badgeBg: "#FFF1DE", badgeText: "#8A5A12" },
@@ -24,16 +22,13 @@ const FILTER_TABS: { key: FilterTab; label: string }[] = [
   { key: "archived", label: "Archived" },
 ];
 
-// A small fixed palette, picked deterministically from the company name so
-// the same company always gets the same color across reloads (and matches
-// the same row every time), without having to store a color anywhere.
 const AVATAR_COLORS = [
-  "#161320", // black
-  "#2D5BFF", // blue
-  "#6D4AFF", // purple
-  "#1E9E5A", // green
-  "#C2760C", // amber
-  "#D9651B", // orange
+  "#161320",
+  "#2D5BFF",
+  "#6D4AFF",
+  "#1E9E5A",
+  "#C2760C",
+  "#D9651B",
 ];
 
 function avatarColor(name: string): string {
@@ -124,7 +119,6 @@ const Jobs = () => {
         </button>
       </div>
 
-      {/* status tabs */}
       <div className="mb-[16px] inline-flex flex-wrap items-center gap-[4px] rounded-full border-[1.07px] border-[#ECEBF0] bg-white p-[6px]">
         {FILTER_TABS.map((tab) => (
           <button
@@ -145,7 +139,6 @@ const Jobs = () => {
         ))}
       </div>
 
-      {/* search */}
       <div className="mb-[20px] flex w-full items-center gap-[10px] rounded-full border-[1.07px] border-[#ECEBF0] bg-white px-[16px] py-[11px]">
         <svg
           className="size-[16px] shrink-0 text-[#8B8798]"

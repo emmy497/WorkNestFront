@@ -24,9 +24,6 @@ const EMPTY_SCORECARD: Scorecard = {
   portfolioWork: 0,
 };
 
-// Average of the 4 ratings, one decimal place. 0 while nothing's rated yet.
-// Guards against a missing/partial scorecard (e.g. an application saved
-// before this field existed) rather than trusting the type at runtime.
 function overallScore(scorecard: Scorecard | undefined | null): number {
   const values = Object.values(scorecard ?? EMPTY_SCORECARD);
   const sum = values.reduce((total, v) => total + (v ?? 0), 0);
@@ -42,21 +39,14 @@ const SCORECARD_ROWS: { key: keyof Scorecard; label: string }[] = [
 
 interface ApplicationReviewProps {
   id: string;
-  // Called when the panel should close — the parent (Pipeline) owns whether
-  // that means clearing a URL param, local state, or both.
   onClose: () => void;
 }
 
-// The content of the review slide-over. Deliberately has no idea it's inside
-// a drawer — it just renders a scrollable column of sections and takes
-// `id`/`onClose` as props, so Pipeline can mount it wherever it likes.
 const ApplicationReview = ({ id, onClose }: ApplicationReviewProps) => {
   const [application, setApplication] = useState<AdminApplicationDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Local, editable copies — only written back on "Save notes & score", so
-  // typing in the note box doesn't fire a request on every keystroke.
   const [scorecard, setScorecard] = useState<Scorecard>(EMPTY_SCORECARD);
   const [internalNote, setInternalNote] = useState("");
 
@@ -107,7 +97,6 @@ const ApplicationReview = ({ id, onClose }: ApplicationReviewProps) => {
 
   return (
     <div className="flex h-full flex-col">
-      {/* drawer header — stays put while the body below scrolls */}
       <div className="flex shrink-0 items-center justify-between border-b-[1.07px] border-b-[#ECEBF0] px-[24px] py-[18px]">
         <span className="font-['Bricolage_Grotesque'] font-bold text-[16px] text-[#161320]">
           Application review
@@ -154,8 +143,6 @@ const ApplicationReview = ({ id, onClose }: ApplicationReviewProps) => {
   );
 };
 
-// Split out so the loading/error branches above don't have to thread these
-// eight props through — this only ever renders once `application` is loaded.
 interface ApplicationReviewBodyProps {
   application: AdminApplicationDetail;
   scorecard: Scorecard;
@@ -185,7 +172,6 @@ function ApplicationReviewBody({
 
   return (
     <div>
-      {/* header */}
       <div className="mb-[22px] flex items-start justify-between gap-[12px]">
         <div className="flex items-center gap-[14px]">
           <div className="flex size-[52px] shrink-0 items-center justify-center rounded-full bg-[#F1EDFF] font-['Inter'] text-[17px] font-semibold text-[#6D4AFF]">
@@ -209,7 +195,6 @@ function ApplicationReviewBody({
         </span>
       </div>
 
-      {/* candidate info */}
       <div className="mb-[22px]">
         <div className="mb-[10px] font-['Inter'] text-[11px] font-semibold tracking-[0.08em] text-[#8B8798]">
           CANDIDATE
@@ -234,7 +219,6 @@ function ApplicationReviewBody({
         </div>
       </div>
 
-      {/* screening answers */}
       <div className="mb-[22px] border-t-[1.07px] border-t-[#ECEBF0] pt-[18px]">
         <div className="mb-[8px] font-['Inter'] text-[11px] font-semibold tracking-[0.08em] text-[#8B8798]">
           SCREENING ANSWERS
@@ -246,8 +230,6 @@ function ApplicationReviewBody({
           {application.whyThisRole}
         </p>
 
-        {/* Only present on jobs whose poster added questions of their own —
-            see JobEditor.tsx's "Screening questions" section. */}
         {application.screeningAnswers.map((entry, index) => (
           <div key={index} className="mt-[14px]">
             <div className="mb-[4px] font-['Inter'] text-[12.5px] font-semibold text-[#161320]">
@@ -260,7 +242,6 @@ function ApplicationReviewBody({
         ))}
       </div>
 
-      {/* scorecard */}
       <div className="mb-[22px] border-t-[1.07px] border-t-[#ECEBF0] pt-[18px]">
         <div className="mb-[14px] font-['Inter'] text-[11px] font-semibold tracking-[0.08em] text-[#8B8798]">
           SCORECARD — AGAINST THIS ROLE
@@ -288,7 +269,6 @@ function ApplicationReviewBody({
         </div>
       </div>
 
-      {/* internal notes */}
       <div className="mb-[22px] border-t-[1.07px] border-t-[#ECEBF0] pt-[18px]">
         <div className="mb-[8px] font-['Inter'] text-[11px] font-semibold tracking-[0.08em] text-[#8B8798]">
           INTERNAL NOTES — ONLY YOUR TEAM SEES THESE
@@ -302,7 +282,6 @@ function ApplicationReviewBody({
         />
       </div>
 
-      {/* actions */}
       <div className="flex flex-wrap items-center justify-between gap-[12px] border-t-[1.07px] border-t-[#ECEBF0] pt-[18px]">
         <button
           type="button"

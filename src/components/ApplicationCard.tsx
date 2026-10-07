@@ -17,7 +17,6 @@ const ApplicationCard = ({ application }: ApplicationCardProps) => {
 
   return (
     <div className="rounded-[24px] border-[1.07px] border-[#ECEBF0] bg-white p-5 lg:p-[25.6px] shadow-[0px_1.07px_3.2px_0px_#1613200F,0px_1.07px_2.13px_0px_#1613200D]">
-      {/* header */}
       <div className="mb-[20px] flex flex-wrap items-start justify-between gap-3">
         <div className="flex gap-[12px]">
           <img
@@ -49,12 +48,10 @@ const ApplicationCard = ({ application }: ApplicationCardProps) => {
         </div>
       </div>
 
-      {/* progress tracker */}
       <div className="mb-[18px]">
         <Stepper labels={stageLabels} currentIndex={config.stageIndex} />
       </div>
 
-      {/* status message + view role */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-t-[1.07px] border-t-[#F2F1F6] pt-[14.94px]">
         <div className="flex items-center gap-[8px] font-['Inter'] text-[12.5px] text-[#4B4757]">
           <FaInfoCircle className="size-[13px] shrink-0 text-[#8B8798]" />

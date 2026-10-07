@@ -12,12 +12,9 @@ const SignUp = () => {
   const { register, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
 
-  // The Apply-gate modal sends `from` — where to land once the account is
-  // ready, e.g. back on the job application that prompted the signup.
   const location = useLocation();
   const from = (location.state as { from?: string } | null)?.from || "/find-jobs";
 
-  // One piece of state per field.
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,8 +28,6 @@ const SignUp = () => {
   const [submitting, setSubmitting] = useState(false);
   const [googleSubmitting, setGoogleSubmitting] = useState(false);
 
-  // Google already verifies the email, so unlike the form above this logs
-  // the user straight in — no "check your inbox for a code" step.
   const signUpWithGoogle = useGoogleLogin({
     flow: "implicit",
     onSuccess: async (tokenResponse) => {
@@ -59,8 +54,6 @@ const SignUp = () => {
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    // Checked here so the user gets told immediately, instead of waiting
-    // for the server to reject it.
     const nextErrors: typeof errors = {};
     if (!name.trim()) nextErrors.name = "Full name is required";
     if (!email.trim()) nextErrors.email = "Email address is required";
@@ -86,9 +79,6 @@ const SignUp = () => {
     try {
       await register(name, email, password);
 
-      // The account exists but isn't verified yet, so we don't have a token.
-      // Send them to the verify page, passing the email (and `from`) along
-      // in the navigation state so they don't have to type it again.
       navigate("/verify-email", { state: { email, from } });
     } catch (err) {
       toast.error(
@@ -187,7 +177,6 @@ const SignUp = () => {
             )}
           </div>
 
-          {/* Confirm password */}
           <div className="mt-[8px]">
             <div className="mb-[8px] font-medium text-[13.66px] leading-[20.48px] text-[#4B4757]">
               Confirm Password
@@ -225,12 +214,8 @@ const SignUp = () => {
           </div>
         </div>
 
-        {/* Sign up and google buttons */}
         <div>
 
-          {/* This must be a <button type="submit">, not a link.
-              A link navigates away; only a submit button triggers
-              the form's onSubmit handler. */}
           <button
             type="submit"
             disabled={submitting}
@@ -239,14 +224,12 @@ const SignUp = () => {
             {submitting ? "Creating account..." : "Create account"}
           </button>
 
-          {/* or */}
           <div className="flex items-center gap-[5px] mb-[15px]">
             <div className="h-[2.08px] flex-1 bg-[linear-gradient(90deg,rgba(135,135,137,0)_11.88%,#878789_100%)]" />
             <span className="font-normal text-[12px] text-[#878789]">Or</span>
             <div className="h-[2.08px] flex-1 bg-[linear-gradient(270deg,rgba(135,135,137,0)_11.88%,#878789_100%)]" />
           </div>
 
-          {/* Google button */}
           <button
             type="button"
             onClick={() => signUpWithGoogle()}
@@ -264,7 +247,6 @@ const SignUp = () => {
           </button>
         </div>
 
-        {/* Create Account */}
         <div className="flex flex-wrap items-center justify-center gap-[8px]">
           <div className="font-normal text-[12px] text-[#878789]">
             Already have an account?

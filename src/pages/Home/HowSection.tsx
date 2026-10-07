@@ -44,7 +44,6 @@ const HowSection = () => {
               </div>
             </div>
 
-            {/* Apply */}
             <div className="w-full h-auto lg:h-[283px] rounded-[24px] lg:rounded-[30.94px] border-[1.11px] border-[#ECEBF0] bg-white p-6 lg:p-[35.37px] gap-[10.06px] shadow-[0px_1.11px_3.32px_0px_#1613200F,0px_1.11px_2.21px_0px_#1613200D]">
               <img src="/images/Bolt.svg" alt="" />
               <div className="font-['Inter'] font-normal text-[11px] lg:text-[12.71px] leading-relaxed lg:leading-[19.06px] tracking-[1.27px] align-middle text-[#8B8798] mt-4 lg:mt-[23px] [leading-trim:none]">
@@ -90,7 +89,6 @@ const HowSection = () => {
         </div>
       </div>
 
-      {/* Four steps. One of them is the reason people stay  */}
       <section className="mt-16 lg:mt-[155px] px-4 sm:px-8 md:px-16 lg:px-[100px] mb-16 lg:mb-[140px]">
         <div className="flex flex-col w-full max-w-[570px] h-auto gap-4 lg:gap-[34px] mx-auto mb-10 lg:mb-[68px]">
           <div className="font-['Bricolage_Grotesque'] font-bold text-3xl sm:text-4xl lg:text-[46px] leading-tight lg:leading-[47.84px] tracking-tight lg:tracking-[-1.29px] text-center align-middle [leading-trim:none]">
@@ -104,14 +102,11 @@ const HowSection = () => {
           </div>
         </div>
 
-        {/* flex container start */}
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-[34px]">
           <div className="w-full flex-1 min-w-0 bg-[#140A28] rounded-[24px] lg:rounded-[31.22px] pt-6 pb-6 px-6 lg:pt-[32.34px] lg:pb-[33.45px] lg:px-[33.45px]">
             <div className="font-['Inter'] font-normal text-[11px] lg:text-[12.82px] leading-relaxed lg:leading-[19.24px] tracking-[0.77px] align-middle [leading-trim:none] text-[#FFC93C] mb-6 lg:mb-[34px]">
-              // read by a human
             </div>
 
-            {/* Every Application */}
             <div className="font-['Bricolage_Grotesque'] font-bold text-2xl sm:text-3xl lg:text-[33.45px] leading-tight lg:leading-[50.18px] tracking-tight lg:tracking-[-0.67px] align-middle [leading-trim:none] text-white">
               Every application is actually reviewed.
             </div>
@@ -123,13 +118,9 @@ const HowSection = () => {
             </div>
           </div>
 
-          {/* Right part of div */}
-
           <div className="w-full flex-1">
-            {/* You always know where you stand */}
             <div className="h-auto rounded-[24px] lg:rounded-[31.22px] border-[1.12px] border-[#ECEBF0] py-4 lg:py-[16.73px] px-6 lg:px-[33.45px] gap-[7.81px]">
               <div className="font-['Inter'] font-normal text-[11px] lg:text-[12.82px] leading-relaxed lg:leading-[19.24px] tracking-[0.77px] align-middle [leading-trim:none]">
-                // no ghosting
               </div>
               <div className="font-['Bricolage_Grotesque'] font-bold text-lg lg:text-[23.42px] leading-snug lg:leading-[35.13px] tracking-tight lg:tracking-[-0.47px] align-middle [leading-trim:none]">
                 You always know where you stand
@@ -164,7 +155,6 @@ const HowSection = () => {
               </div>
               <div className="h-auto w-full flex-1 rounded-[24px] lg:rounded-[31.22px] border-[1.12px] border-[#ECEBF0] pt-6 pr-6 pb-6 pl-6 lg:pt-[32.34px] lg:pr-[33.45px] lg:pb-[54.74px] lg:pl-[33.45px] gap-[5.8px]">
                 <div className="font-['Inter'] font-normal text-[11px] lg:text-[12.82px] leading-relaxed lg:leading-[19.24px] tracking-[0.77px] align-middle text-[#6D4AFF] [leading-trim:none] mb-3 lg:mb-[13px]">
-                  // live roles only
                 </div>
                 <div className="font-['Bricolage_Grotesque'] font-bold text-lg lg:text-[20.07px] leading-snug lg:leading-[30.11px] tracking-tight lg:tracking-[-0.4px] align-middle text-[#161320] [leading-trim:none] mb-[6px]">
                   Real, open roles

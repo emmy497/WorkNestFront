@@ -7,15 +7,9 @@ type ApplyGateModalProps = {
   onClose: () => void;
 };
 
-// Shown instead of navigating straight to /apply/:jobId when nobody is
-// logged in. "Continue as a guest" still goes there directly — the route
-// and the backend both accept an application with no account behind it.
 const ApplyGateModal = ({ jobId, jobTitle, onClose }: ApplyGateModalProps) => {
   const navigate = useNavigate();
 
-  // Carried through signup/login as location.state.from, so the candidate
-  // lands back on THIS job's application instead of a generic page once
-  // they're done — see Login.tsx / SignUp.tsx / VerifyEmail.tsx.
   const from = `/apply/${jobId}`;
 
   return (

@@ -19,38 +19,24 @@ const FindJobs = () => {
   const [selected, setSelected] = useState<SelectedFilters>(emptyFilters);
   const [sort, setSort] = useState<SortOption>("newest");
 
-  // The search text and location live in the URL rather than in useState.
-  //
-  // That buys us three things for free:
-  //   1. The Home page can link straight here with ?q=react
-  //   2. The URL can be copied, bookmarked, or shared
-  //   3. The back button undoes a search
   const [searchParams, setSearchParams] = useSearchParams();
 
   const query = searchParams.get("q") ?? "";
   const location = searchParams.get("location") ?? ANY_LOCATION;
 
-  // Writes a value into the URL, or removes it when it's empty.
   function setSearchParam(key: string, value: string) {
     const next = new URLSearchParams(searchParams);
 
     if (value) next.set(key, value);
     else next.delete(key);
 
-    // replace: true means typing doesn't add a new history entry per
-    // keystroke — otherwise the back button would step through every letter.
     setSearchParams(next, { replace: true });
   }
 
-  // Three pieces of state, because there are three things the screen can show:
-  // the jobs, a loading spinner, or an error message.
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Runs ONCE when the page first loads (that's what the empty [] means).
-  // Fetching data is a side effect — it reaches outside React — so it belongs
-  // in useEffect rather than in the component body.
   useEffect(() => {
     fetchJobs()
       .then((data) => setJobs(data))
@@ -72,20 +58,11 @@ const FindJobs = () => {
     setSearchParams(new URLSearchParams(), { replace: true });
   };
 
-  // The list of places to offer in the dropdown, taken from the jobs we
-  // actually have. `new Set(...)` removes duplicates, and the spread turns
-  // it back into an array we can sort.
   const locations = [...new Set(jobs.map((job) => job.location))].sort();
 
-  // Does this job match what was typed in the search box?
-  //
-  // We check the title, the company, and the skills — so searching "react"
-  // finds a job whose title doesn't mention React but whose skills do.
   function matchesQuery(job: Job): boolean {
-    // Nothing typed means everything matches.
     if (!query.trim()) return true;
 
-    // Lowercase both sides so "React" also finds "react".
     const needle = query.trim().toLowerCase();
 
     const haystack = [job.title, job.companyName, ...job.skills]
@@ -95,7 +72,6 @@ const FindJobs = () => {
     return haystack.includes(needle);
   }
 
-  // A group with nothing checked means "no restriction" for that group.
   const visibleJobs = jobs
     .filter((job) =>
       (Object.keys(selected) as FilterKey[]).every(
@@ -107,8 +83,6 @@ const FindJobs = () => {
     .sort((a, b) => {
       if (sort === "closing") return a.closesInDays - b.closesInDays;
       if (sort === "salary") return b.salaryMax - a.salaryMax;
-      // "newest" — the API already sends them newest-first, so leave the
-      // order alone. Returning 0 means "these two are equal, don't swap".
       return 0;
     });
 
@@ -129,8 +103,6 @@ const FindJobs = () => {
             shortlisted by our team.
           </div>
 
-          {/* Passing values + change handlers makes this a controlled
-              component: the list below updates as you type. */}
           <SearchBar
             query={query}
             onQueryChange={(value) => setSearchParam("q", value)}
@@ -140,7 +112,6 @@ const FindJobs = () => {
           />
         </div>
 
-        {/* Filters + results */}
         <section className="flex flex-col lg:flex-row gap-6 lg:gap-[24px] mb-24 lg:mb-[140px]">
           <JobFilters
             jobs={jobs}
@@ -151,7 +122,6 @@ const FindJobs = () => {
           />
 
           <div className="min-w-0 flex-1">
-            {/* results header */}
             <div className="mb-[18px] flex flex-wrap items-center justify-between gap-3">
               <div className="font-['Inter'] text-[13px] text-[#4B4757]">
                 <span className="font-semibold text-[#161320]">
@@ -179,7 +149,6 @@ const FindJobs = () => {
               </div>
             </div>
 
-            {/* results grid — three possible states: loading, error, or data */}
             {loading ? (
               <div className="rounded-[24px] border-[1.07px] border-[#ECEBF0] bg-[#FAFAFB] p-10 text-center font-['Inter'] text-[13.5px] text-[#4B4757]">
                 Loading roles…

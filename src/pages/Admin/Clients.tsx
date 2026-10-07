@@ -5,8 +5,6 @@ import type { ClientListItem } from "../../types/job";
 import { fetchClients } from "../../api/adminCompanies";
 import ClientModal from "../../components/ClientModal";
 
-// Same deterministic palette idea as Jobs.tsx's avatarColor — a client
-// without a logo always gets the same color square across reloads.
 const AVATAR_COLORS = ["#161320", "#2D5BFF", "#6D4AFF", "#1E9E5A", "#C2760C", "#D9651B"];
 
 function avatarColor(name: string): string {
@@ -76,7 +74,6 @@ const Clients = () => {
         </button>
       </div>
 
-      {/* search */}
       <div className="mb-[20px] flex w-full items-center gap-[10px] rounded-full border-[1.07px] border-[#ECEBF0] bg-white px-[16px] py-[11px] sm:ml-auto sm:max-w-[320px]">
         <svg
           className="size-[16px] shrink-0 text-[#8B8798]"

@@ -4,26 +4,17 @@ import { FiX } from "react-icons/fi";
 import Logo from "../../components/Logo";
 import type { Job } from "../../types/job";
 
-// The four steps, in order. The wizard tracks which one you're on by index.
 export const APPLY_STEPS = ["Your details", "CV & links", "Questions", "Review"];
 
 type ApplyLayoutProps = {
   job: Job;
-  currentStep: number; // 0-based index into APPLY_STEPS
+  currentStep: number;
   children: ReactNode;
 };
 
-// ---------------------------------------------------------------------------
-// The frame every step of the apply flow shares: the slim header, the job
-// card, and the step tracker.
-//
-// Note there's no Navbar or Footer here — this is a focused task, so we
-// deliberately strip the site chrome away and leave only "Save & exit".
-// ---------------------------------------------------------------------------
 const ApplyLayout = ({ job, currentStep, children }: ApplyLayoutProps) => {
   return (
     <div className="min-h-screen bg-[#FAFAFB]">
-      {/* Slim header */}
       <header className="flex items-center justify-between px-4 py-[22px] sm:px-8 lg:px-[100px]">
         <Logo width={117} />
 
@@ -37,8 +28,6 @@ const ApplyLayout = ({ job, currentStep, children }: ApplyLayoutProps) => {
       </header>
 
       <div className="mx-auto w-full max-w-[720px] px-4 pb-24 sm:px-6">
-        {/* Which job you're applying to — visible on every step, so you
-            never lose track of it partway through. */}
         <div className="flex items-center justify-between gap-4 rounded-[18px] border-[1.07px] border-[#ECEBF0] bg-white p-[18px] shadow-[0px_1.07px_3.2px_0px_#1613200F]">
           <div className="flex min-w-0 items-center gap-[14px]">
             <img
@@ -64,7 +53,6 @@ const ApplyLayout = ({ job, currentStep, children }: ApplyLayoutProps) => {
           </div>
         </div>
 
-        {/* Step tracker */}
         <div className="mt-[26px] flex items-center overflow-x-auto pb-1">
           {APPLY_STEPS.map((label, index) => {
             const isDone = index < currentStep;
@@ -86,8 +74,6 @@ const ApplyLayout = ({ job, currentStep, children }: ApplyLayoutProps) => {
                           : "border-[#ECEBF0] bg-white text-[#8B8798]"
                     }`}
                   >
-                    {/* A tick once the step is behind you, the number while
-                        it's ahead of you or current. */}
                     {isDone ? "✓" : index + 1}
                   </span>
 
@@ -116,7 +102,6 @@ const ApplyLayout = ({ job, currentStep, children }: ApplyLayoutProps) => {
           })}
         </div>
 
-        {/* The step's own card */}
         {children}
       </div>
     </div>

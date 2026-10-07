@@ -1,9 +1,5 @@
 @import "tailwindcss";
 
-/* Tailwind's preflight resets buttons to cursor: default, unlike the
-   browser's own default. Restore a pointer cursor on every clickable
-   control project-wide, instead of adding cursor-pointer by hand to
-   every single button. */
 @layer base {
   button,
   [type="button"],
@@ -25,11 +21,6 @@
   }
 }
 
-/* ---------------------------------------------------------------------------
-   Animations
-   --------------------------------------------------------------------------- */
-
-/* Fade in while drifting up a little. Used by the hero photos. */
 @keyframes fade-in-up {
   from {
     opacity: 0;
@@ -41,9 +32,6 @@
   }
 }
 
-/* Slide down from nothing. Used by the mobile menu.
-   Animating max-height rather than height lets us grow to fit the content
-   without knowing how tall it is. */
 @keyframes slide-down {
   from {
     opacity: 0;
@@ -58,8 +46,6 @@
 }
 
 .animate-fade-in-up {
-  /* "backwards" makes the element use the FROM state before the animation
-     starts. Without it, a delayed image flashes at full opacity first. */
   animation: fade-in-up 0.6s ease-out backwards;
 }
 
@@ -68,8 +54,6 @@
   overflow: hidden;
 }
 
-/* Anyone who has asked their device to reduce motion gets no movement.
-   The content still appears — it just arrives instantly. */
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in-up,
   .animate-slide-down {

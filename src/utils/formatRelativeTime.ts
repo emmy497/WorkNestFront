@@ -1,6 +1,3 @@
-// Turns an ISO date string into "Applied today" / "Applied 3 days ago" /
-// "Applied 2 weeks ago" style text, matching the wording used on the
-// Applications page.
 export function formatRelativeTime(isoDate: string): string {
   const then = new Date(isoDate).getTime();
   const now = Date.now();

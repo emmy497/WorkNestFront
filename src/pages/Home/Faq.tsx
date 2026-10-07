@@ -42,7 +42,6 @@ const Faq = () => {
   return (
     <section className="mt-24 lg:mt-[180px] mb-24 lg:mb-[180px] px-4 sm:px-8 md:px-16 lg:px-[100px]">
       <div className="flex flex-col lg:flex-row gap-10 lg:gap-[100px]">
-        {/* Left part */}
         <div className="w-full lg:max-w-[400px] lg:flex-1">
           <div className="font-['Inter'] font-medium text-[13.06px] leading-[19.59px] tracking-[1.83px] uppercase text-[#6D4AFF]">
             faq
@@ -64,7 +63,6 @@ const Faq = () => {
           </a>
         </div>
 
-        {/* Right part */}
         <div className="w-full lg:flex-1">
           {faqs.map((faq, index) => {
             const isOpen = openIndex === index;

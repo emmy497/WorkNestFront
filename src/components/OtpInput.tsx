@@ -6,15 +6,6 @@ type OtpInputProps = {
   length?: number;
 };
 
-// ---------------------------------------------------------------------------
-// Six separate boxes for the 6-digit code, one digit per box, with focus
-// auto-advancing as you type (and moving back on backspace).
-//
-// Both the verify-email page and the reset-password page use this, which is
-// why it lives in components/ rather than inside one page. The external
-// shape stays the same as before — a single `value` string and `onChange` —
-// so neither page needed to change to pick up the new look.
-// ---------------------------------------------------------------------------
 const OtpInput = ({ value, onChange, length = 6 }: OtpInputProps) => {
   const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
 
@@ -27,8 +18,6 @@ const OtpInput = ({ value, onChange, length = 6 }: OtpInputProps) => {
   }
 
   function handleChange(index: number, e: React.ChangeEvent<HTMLInputElement>) {
-    // Only keep the last typed character, and only if it's a digit — this
-    // also quietly handles the "select all, type over it" case.
     const raw = e.target.value.replace(/[^0-9]/g, "");
     const digit = raw.slice(-1);
 
@@ -41,8 +30,6 @@ const OtpInput = ({ value, onChange, length = 6 }: OtpInputProps) => {
 
   function handleKeyDown(index: number, e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Backspace" && !digits[index] && index > 0) {
-      // Box is already empty — jump back and clear the previous one too,
-      // so backspace feels like it's deleting through the whole code.
       inputsRef.current[index - 1]?.focus();
       setDigitAt(index - 1, "");
     }

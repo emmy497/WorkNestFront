@@ -1,7 +1,5 @@
 import type { Job } from "../types/job";
 
-// TODO: replace with a real API call (e.g. GET /api/jobs) once the backend is ready.
-// Keep the `Job` shape in ../types/job.ts in sync with whatever the API actually returns.
 export const mockJobs: Job[] = [
   {
     id: "1",

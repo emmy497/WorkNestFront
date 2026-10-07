@@ -13,9 +13,6 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-// A live preview of the little card a recruiter sees when your application
-// shows up in their list — reusing the same name/headline/skills the
-// candidate is filling in above, so it updates as they type.
 const ProfilePreviewCard = ({ profile }: ProfilePreviewCardProps) => {
   return (
     <div className="rounded-[16px] bg-[#140A28] p-5">

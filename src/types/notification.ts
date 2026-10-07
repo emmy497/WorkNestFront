@@ -17,10 +17,9 @@ export interface Notification {
   title: string;
   body: string;
   isRead: boolean;
-  // Only present when type is "application_status".
   status: ApplicationStatus | null;
   jobId: string | null;
-  createdAt: string; // ISO date string
+  createdAt: string;
 }
 
 interface NotificationLook {
@@ -39,8 +38,6 @@ const ORANGE: Pick<NotificationLook, "iconColor" | "iconBg"> = {
   iconBg: "#FFF1DE",
 };
 
-// Every ApplicationStatus that STATUS_NOTIFICATION_COPY on the backend
-// actually creates a notification for (everything except "submitted").
 const LOOK_BY_STATUS: Partial<Record<ApplicationStatus, NotificationLook>> = {
   review: { icon: FiSearch, ...ORANGE },
   shortlisted: { icon: FiCheckCircle, ...PURPLE },

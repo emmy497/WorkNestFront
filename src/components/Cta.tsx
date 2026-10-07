@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 
+
 const Cta = () => {
   return (
     <section className="px-4 sm:px-8 md:px-16 lg:px-[100px]">
@@ -15,7 +16,7 @@ const Cta = () => {
           className="pointer-events-none absolute bottom-0 right-0 max-w-[60%] lg:max-w-none"
         />
         <img
-          className="pointer-events-none absolute top-0 left-0 h-[80px] w-[80px] rounded-tl-[24px] sm:h-[110px] sm:w-[110px] lg:h-[160px] lg:w-[160px] lg:rounded-tl-[35px]"
+          className="pointer-events-none absolute t `op-0 left-0 h-[80px] w-[80px] rounded-tl-[24px] sm:h-[110px] sm:w-[110px] lg:h-[160px] lg:w-[160px] lg:rounded-tl-[35px]"
           src="/images/cta-black.svg"
           alt=""
         />

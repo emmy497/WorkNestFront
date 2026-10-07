@@ -6,8 +6,6 @@ interface JobsClosingSoonProps {
   jobs: ClosingJob[];
 }
 
-// Cycled by position so each row in the list gets a visually distinct
-// square, the same way the design mock varies them.
 const SQUARE_COLORS = ["#6D4AFF", "#161320", "#C6531B"];
 
 const JobsClosingSoon = ({ jobs }: JobsClosingSoonProps) => {

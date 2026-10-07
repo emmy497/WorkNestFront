@@ -2,17 +2,9 @@ import { FaCheck } from "react-icons/fa";
 
 interface StepperProps {
   labels: string[];
-  // Index of the step currently active/reached. `null` means "not on this
-  // track at all" — e.g. a rejected application — and renders every step
-  // in the same fully-muted state instead of showing partial progress.
   currentIndex: number | null;
 }
 
-// A horizontal progress tracker: circles connected by lines, each circle
-// either completed (filled, checkmark), current (ringed), or upcoming
-// (empty). Used on the Applications page, but kept generic — it only needs
-// a list of labels and where "now" is, so it can be reused for any
-// multi-stage process later (onboarding, checkout, etc.).
 const Stepper = ({ labels, currentIndex }: StepperProps) => {
   return (
     <div className="flex w-full items-start">

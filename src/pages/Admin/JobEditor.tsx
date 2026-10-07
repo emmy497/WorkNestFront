@@ -23,9 +23,6 @@ const inputClass =
 
 const labelClass = "mb-[8px] block font-['Inter'] text-[13px] font-medium text-[#4B4757]";
 
-// Swaps the border color wholesale rather than appending a second border
-// class alongside it — two border-color utilities on one element race each
-// other in the generated CSS, so only one variant of the string is ever used.
 function fieldClass(hasError: boolean): string {
   return hasError
     ? inputClass
@@ -75,8 +72,6 @@ const EMPTY_FORM: FormState = {
   closesAt: "",
 };
 
-// A pill group acting as a single-select — same look every status/filter
-// pill in this app already uses.
 function PillGroup<T extends string>({
   options,
   value,
@@ -115,9 +110,6 @@ function PillGroup<T extends string>({
 const JobEditor = () => {
   const navigate = useNavigate();
 
-  // The Client detail page's "New role" button sends its company id along
-  // so the form opens already scoped to that client instead of making the
-  // admin pick it again from the dropdown.
   const location = useLocation();
   const preselectedCompanyId = (location.state as { companyId?: string } | null)?.companyId ?? "";
 
@@ -128,9 +120,6 @@ const JobEditor = () => {
   const [screeningQuestions, setScreeningQuestions] = useState<string[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Tracks WHICH action is in flight, so the other button can stay enabled
-  // (not strictly needed, but disabling only the one that was clicked reads
-  // better than freezing the whole form).
   const [submitting, setSubmitting] = useState<"draft" | "publish" | null>(null);
 
   useEffect(() => {
@@ -197,8 +186,6 @@ const JobEditor = () => {
         title: form.title.trim(),
         companyId: form.companyId,
         location: form.location.trim(),
-        // validate() above already guarantees these are non-empty — the
-        // casts just tell TypeScript what it can't infer across functions.
         workArrangement: form.workArrangement as WorkArrangement,
         jobType: form.jobType as JobType,
         experienceLevel: form.experienceLevel as ExperienceLevel,
@@ -251,7 +238,6 @@ const JobEditor = () => {
         Create and publish a role for a client.
       </p>
 
-      {/* Section 1 — Basics */}
       <Section number={1} title="Basics">
         <div>
           <label className={labelClass}>Job title</label>
@@ -336,9 +322,6 @@ const JobEditor = () => {
         </div>
 
         <div>
-          {/* Not in the mockup — the Job model requires a career path, and
-              the public Find Jobs filter sorts by it, so a real value is
-              needed here rather than a guessed default. */}
           <label className={labelClass}>Career path</label>
           <select
             className={fieldClass(Boolean(errors.careerPath))}
@@ -356,7 +339,6 @@ const JobEditor = () => {
         </div>
       </Section>
 
-      {/* Section 2 — Role details */}
       <Section number={2} title="Role details">
         <div>
           <label className={labelClass}>About the role</label>
@@ -407,7 +389,6 @@ const JobEditor = () => {
         </div>
       </Section>
 
-      {/* Section 3 — Compensation & logistics */}
       <Section number={3} title="Compensation & logistics">
         <div className="grid grid-cols-1 gap-[16px] sm:grid-cols-2">
           <div>
@@ -458,7 +439,6 @@ const JobEditor = () => {
         </div>
       </Section>
 
-      {/* Section 4 — Screening questions */}
       <Section number={4} title="Screening questions">
         {screeningQuestions.length === 0 ? (
           <p className="font-['Inter'] text-[13.5px] text-[#8B8798]">
@@ -497,7 +477,6 @@ const JobEditor = () => {
         </button>
       </Section>
 
-      {/* bottom bar */}
       <div className="mt-[8px] flex flex-wrap items-center justify-between gap-[12px] pb-[40px]">
         <button
           type="button"

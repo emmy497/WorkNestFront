@@ -46,8 +46,6 @@ type JobFiltersProps = {
   onToggle: (key: FilterKey, value: string) => void;
   onClearAll: () => void;
 
-  // How many jobs are showing right now. Used on the mobile sheet's
-  // "Show N roles" button so you can see the effect before closing it.
   resultCount?: number;
 };
 
@@ -58,35 +56,26 @@ const JobFilters = ({
   onClearAll,
   resultCount,
 }: JobFiltersProps) => {
-  // Only used on mobile — the desktop sidebar is always visible.
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const countFor = (key: FilterKey, value: string) =>
     jobs.filter((job) => job[key] === value).length;
 
-  // How many boxes are ticked in total, across all four groups.
-  // Shown as a little badge on the mobile "Filters" button.
   const activeCount = Object.values(selected).reduce(
     (total, values) => total + values.length,
     0,
   );
 
-  // While the sheet is open, stop the page behind it from scrolling —
-  // otherwise dragging on the sheet scrolls the job list underneath.
   useEffect(() => {
     if (sheetOpen) {
       document.body.style.overflow = "hidden";
     }
 
-    // Cleanup runs when the sheet closes AND when the page unmounts, so
-    // scrolling can never get stuck off.
     return () => {
       document.body.style.overflow = "";
     };
   }, [sheetOpen]);
 
-  // The checkbox groups themselves. Both the desktop sidebar and the mobile
-  // sheet render this exact same markup — written once, used twice.
   const filterGroups = groups.map((group) => (
     <div key={group.key} className="mt-[26px]">
       <div className="mb-[12px] font-['Inter'] font-medium text-[10px] leading-[15px] tracking-[1.2px] uppercase text-[#8B8798] pt-[27.65px]">
@@ -117,9 +106,6 @@ const JobFilters = ({
 
   return (
     <>
-      {/* ---------------------------------------------------------------
-          MOBILE: a button that opens the sheet. Hidden from lg upwards.
-      --------------------------------------------------------------- */}
       <div className="lg:hidden">
         <button
           type="button"
@@ -128,7 +114,6 @@ const JobFilters = ({
         >
           <FiSliders size={16} className="text-[#6D4AFF]" />
           Filters
-          {/* The badge only appears once something is actually ticked */}
           {activeCount > 0 && (
             <span className="flex h-[20px] min-w-[20px] items-center justify-center rounded-full bg-[#6D4AFF] px-[6px] text-[11px] font-semibold text-white">
               {activeCount}
@@ -137,25 +122,14 @@ const JobFilters = ({
         </button>
       </div>
 
-      {/* ---------------------------------------------------------------
-          MOBILE: the sheet itself. Only in the page when it's open.
-      --------------------------------------------------------------- */}
       {sheetOpen && (
         <div className="lg:hidden">
-          {/* The dark backdrop. Tapping it closes the sheet. */}
           <div
             onClick={() => setSheetOpen(false)}
             className="fixed inset-0 z-40 bg-[#140A28]/45"
           />
 
-          {/* A floating card rather than a full-width sheet.
-              inset-x-4 keeps 16px clear on both sides, bottom-4 lifts it off
-              the bottom edge, and mx-auto + max-w-[420px] centres it so it
-              doesn't stretch out on bigger phones and small tablets. */}
           <div className="fixed inset-x-4 bottom-[max(16px,env(safe-area-inset-bottom))] z-50 mx-auto flex max-h-[68vh] max-w-[420px] flex-col overflow-hidden rounded-[24px] bg-white shadow-[0px_18px_48px_0px_rgba(22,19,32,0.24)]">
-            {/* Header — stays put while the options scroll.
-                shrink-0 stops flexbox squashing it, and the white background
-                means nothing can ever show through from behind. */}
             <div className="flex shrink-0 items-center justify-between border-b border-[#F2F1F6] bg-white px-5 py-[14px]">
               <div className="font-[Bricolage_Grotesque] font-bold text-[18px] leading-[27.12px] tracking-[-0.18px] text-[#161320]">
                 Filters
@@ -180,19 +154,10 @@ const JobFilters = ({
               </div>
             </div>
 
-            {/* The scrollable middle.
-                min-h-0 is the important bit: a flex child refuses to shrink
-                below its content by default, so without it this box grows to
-                fit everything and scrolls the whole sheet instead of just
-                this section.
-                overscroll-contain stops the page behind from scrolling once
-                you reach the end of this list. */}
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-2 [&>div:first-child]:mt-0 [&>div:first-child>div:first-child]:pt-[18px]">
               {filterGroups}
             </div>
 
-            {/* Footer — always reachable. The card already sits above the
-                bottom edge, so no safe-area padding is needed here. */}
             <div className="shrink-0 border-t border-[#F2F1F6] bg-white px-5 py-4">
               <button
                 type="button"
@@ -208,9 +173,6 @@ const JobFilters = ({
         </div>
       )}
 
-      {/* ---------------------------------------------------------------
-          DESKTOP: the original sidebar, unchanged. Hidden below lg.
-      --------------------------------------------------------------- */}
       <aside className="hidden lg:block lg:w-[280px] lg:shrink-0">
         <div className="rounded-[24px] border-[1.07px] border-[#ECEBF0] bg-white p-6 shadow-[0px_1.07px_3.2px_0px_#1613200F,0px_1.07px_2.13px_0px_#1613200D]">
           <div className="flex items-center justify-between">

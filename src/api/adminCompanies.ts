@@ -1,11 +1,6 @@
 import type { ClientDetail, ClientListItem, ClientPayload, CompanyOption } from "../types/job";
 import apiClient, { extractError } from "../lib/apiClient";
 
-// ---------------------------------------------------------------------------
-// GET /api/admin/companies
-//
-// The "Client" dropdown on the New Role form.
-// ---------------------------------------------------------------------------
 export async function fetchCompanies(): Promise<CompanyOption[]> {
   try {
     const res = await apiClient.get<CompanyOption[]>("/admin/companies");
@@ -15,12 +10,6 @@ export async function fetchCompanies(): Promise<CompanyOption[]> {
   }
 }
 
-// ---------------------------------------------------------------------------
-// GET /api/admin/companies/clients
-//
-// Every client plus its computed open-roles/placements stats — the Clients
-// page's card grid.
-// ---------------------------------------------------------------------------
 export async function fetchClients(): Promise<ClientListItem[]> {
   try {
     const res = await apiClient.get<ClientListItem[]>("/admin/companies/clients");
@@ -30,11 +19,6 @@ export async function fetchClients(): Promise<ClientListItem[]> {
   }
 }
 
-// ---------------------------------------------------------------------------
-// GET /api/admin/companies/clients/:id
-//
-// The Client detail page — the company plus every one of its jobs.
-// ---------------------------------------------------------------------------
 export async function fetchClientDetail(id: string): Promise<ClientDetail> {
   try {
     const res = await apiClient.get<ClientDetail>(`/admin/companies/clients/${id}`);
@@ -44,15 +28,6 @@ export async function fetchClientDetail(id: string): Promise<ClientDetail> {
   }
 }
 
-// ---------------------------------------------------------------------------
-// POST /api/admin/companies/clients/logo   (multipart/form-data)
-//
-// No "Content-Type" header on purpose — same reasoning as uploadMyCv in
-// src/api/profile.ts, the browser sets the multipart boundary itself.
-// Standalone rather than tied to a client id, so "New client" can upload the
-// logo before the company exists; the modal holds the returned URL and
-// sends it along with the rest of the form on submit.
-// ---------------------------------------------------------------------------
 export async function uploadClientLogo(file: File): Promise<{ logoUrl: string }> {
   const formData = new FormData();
   formData.append("logo", file);
@@ -65,9 +40,6 @@ export async function uploadClientLogo(file: File): Promise<{ logoUrl: string }>
   }
 }
 
-// ---------------------------------------------------------------------------
-// POST /api/admin/companies/clients
-// ---------------------------------------------------------------------------
 export async function createClient(payload: ClientPayload): Promise<ClientListItem> {
   try {
     const res = await apiClient.post<ClientListItem>("/admin/companies/clients", payload);
@@ -77,9 +49,6 @@ export async function createClient(payload: ClientPayload): Promise<ClientListIt
   }
 }
 
-// ---------------------------------------------------------------------------
-// PATCH /api/admin/companies/clients/:id
-// ---------------------------------------------------------------------------
 export async function updateClient(id: string, payload: ClientPayload): Promise<ClientListItem> {
   try {
     const res = await apiClient.patch<ClientListItem>(`/admin/companies/clients/${id}`, payload);

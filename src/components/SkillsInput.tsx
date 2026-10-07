@@ -6,9 +6,6 @@ type SkillsInputProps = {
   onChange: (skills: string[]) => void;
 };
 
-// A tag input: type a skill, press Enter, it becomes a removable pill.
-// Duplicate and empty entries are quietly ignored rather than shown as
-// errors — this is a low-stakes field, not a form that needs to scold you.
 const SkillsInput = ({ value, onChange }: SkillsInputProps) => {
   const [draft, setDraft] = useState("");
 
@@ -27,11 +24,9 @@ const SkillsInput = ({ value, onChange }: SkillsInputProps) => {
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === "Enter") {
-      e.preventDefault(); // don't submit the surrounding form
+      e.preventDefault();
       addSkill();
     } else if (e.key === "Backspace" && draft === "" && value.length > 0) {
-      // Backspace on an empty input removes the last pill — mirrors how
-      // most tag inputs behave, and saves a click.
       onChange(value.slice(0, -1));
     }
   }

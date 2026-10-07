@@ -6,7 +6,6 @@ interface JobCardProps {
   job: Job;
   showDescription?: boolean;
 
-  // The Home page cards are a preview, so they don't need a bookmark.
   showSaveButton?: boolean;
 }
 
@@ -45,7 +44,6 @@ const JobCard = ({
         featured ? "border-[#FFC93C]" : "border-[#ECEBF0]"
       }`}
     >
-      {/* company */}
       <div className="mb-[15px] flex items-start justify-between gap-3">
         <div className="flex gap-[12px]">
           <img
@@ -76,19 +74,16 @@ const JobCard = ({
         </div>
       </div>
 
-      {/* job title */}
       <div className="font-['Bricolage_Grotesque'] font-bold text-[19px] lg:text-[21.34px] leading-[28px] lg:leading-[32.01px] tracking-[-0.43px] text-[#161320] [leading-trim:none] mb-[10px]">
         {title}
       </div>
 
-      {/* description */}
       {showDescription && (
         <p className="mb-[15px] font-['Inter'] font-normal text-[13.34px] leading-[21px] text-[#4B4757] line-clamp-2">
           {description}
         </p>
       )}
 
-      {/* tags */}
       <div className="mb-[15px] flex flex-wrap gap-[8px]">
         {tags.map((tag, i) => (
           <div
@@ -100,7 +95,6 @@ const JobCard = ({
         ))}
       </div>
 
-      {/* salary + closing */}
       <div className="mt-auto flex w-full items-center justify-between gap-2 border-t-[1.07px] border-t-[#F2F1F6] pt-[14.94px]">
         <div className="font-['Inter'] font-medium text-[13.34px] leading-[20px] text-[#161320] [leading-trim:none]">
           {formatSalary(salaryMin, currency)}–{formatSalary(salaryMax, currency)}{" "}

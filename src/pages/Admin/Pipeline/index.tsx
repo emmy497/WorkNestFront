@@ -10,8 +10,6 @@ import ApplicationReview from "./ApplicationReview";
 
 type FilterTab = ApplicationStatus | "all";
 
-// Order matches the design: "All" first, then pipeline order, "Not selected"
-// (rejected) last since it's a terminal state rather than a stage.
 const FILTER_TABS: { key: FilterTab; label: string }[] = [
   { key: "all", label: "All" },
   { key: "submitted", label: "Submitted" },
@@ -40,14 +38,9 @@ function initials(name: string): string {
 const Pipeline = () => {
   const navigate = useNavigate();
 
-  // Optional — present only when a row's "Review" button (or a deep link,
-  // e.g. from the Overview page) has opened the drawer. The list underneath
-  // never unmounts while this changes, so filters/scroll position survive
-  // opening and closing it.
   const { id: reviewId } = useParams<{ id?: string }>();
   const closeDrawer = () => navigate("/admin/pipeline");
 
-  // Close on Escape, same as clicking the backdrop or the X button.
   useEffect(() => {
     if (!reviewId) return;
 
@@ -69,10 +62,6 @@ const Pipeline = () => {
   const [filter, setFilter] = useState<FilterTab>("all");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
-  // One fetch of everything — role and status are both filtered client-side,
-  // so switching between them (or between roles) never needs another
-  // round trip. Fine at this scale; worth paginating server-side later if
-  // the pipeline ever grows into the thousands of applications.
   useEffect(() => {
     fetchAdminApplications()
       .then(setApplications)
@@ -80,8 +69,6 @@ const Pipeline = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  // Every distinct role that has at least one applicant, most-applied first
-  // — so the page opens on the role most likely to need attention.
   const roleOptions = useMemo<RoleOption[]>(() => {
     const byJob = new Map<string, RoleOption>();
 
@@ -103,10 +90,6 @@ const Pipeline = () => {
     return Array.from(byJob.values()).sort((a, b) => b.count - a.count);
   }, [applications]);
 
-  // Default to the busiest role until the admin explicitly picks one —
-  // computed on every render instead of synced into state via an effect, so
-  // there's no extra render pass and no risk of it drifting out of sync with
-  // roleOptions once the data arrives.
   const effectiveJobId = selectedJobId ?? roleOptions[0]?.jobId ?? null;
 
   const selectedRole = roleOptions.find((role) => role.jobId === effectiveJobId) ?? null;
@@ -165,7 +148,6 @@ const Pipeline = () => {
         Evaluate, score, and move candidates through the hiring stages — per role.
       </p>
 
-      {/* role selector */}
       {roleOptions.length > 0 && (
         <div className="relative mb-[20px] inline-block">
           <button
@@ -210,7 +192,6 @@ const Pipeline = () => {
         </div>
       )}
 
-      {/* status tabs, scoped to the selected role */}
       <div className="mb-[20px] inline-flex flex-wrap gap-[2px] rounded-full bg-[#FAFAFB] p-[4px]">
         {FILTER_TABS.map((tab) => (
           <button
@@ -348,11 +329,6 @@ const Pipeline = () => {
         )}
       </div>
 
-      {/* Review slide-over. Always mounted so the open/close transform can
-          animate — content only fetches once reviewId is actually set.
-          key={reviewId} forces a fresh instance per candidate, so switching
-          straight from one row's review to another (without closing first)
-          can't leak the previous candidate's unsaved local edits. */}
       <div
         className={`fixed inset-0 z-50 ${reviewId ? "" : "pointer-events-none"}`}
         aria-hidden={!reviewId}

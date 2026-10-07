@@ -82,7 +82,6 @@ const EditProfile = () => {
       setError(err instanceof Error ? err.message : "Could not upload your CV");
     } finally {
       setUploadingCv(false);
-      // Let the same file be re-selected later (e.g. re-uploading after a fix)
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   }
@@ -162,7 +161,6 @@ const EditProfile = () => {
         )}
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.7fr_1fr] mb-24 lg:mb-[100px]">
-          {/* Main column */}
           <div className="flex flex-col gap-6">
             <ProfileSection icon={FiUser} title="The basics">
               <div>
@@ -388,7 +386,6 @@ const EditProfile = () => {
             </ProfileSection>
           </div>
 
-          {/* Sidebar */}
           <div className="flex flex-col gap-6 lg:sticky lg:top-6 lg:self-start">
             <ProfileProgressCard profile={profile} />
             <ProfilePreviewCard profile={profile} />

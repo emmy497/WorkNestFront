@@ -16,8 +16,6 @@ import { toast } from "../../lib/toast";
 import { useAuth } from "../../context/AuthContext";
 import type { Job } from "../../types/job";
 
-// The dropdown options. These match the ones on the Edit Profile page, so a
-// candidate's saved answer always lines up with an option here.
 const EXPERIENCE_OPTIONS = [
   "0-1 years",
   "1-3 years",
@@ -33,7 +31,6 @@ const AVAILABILITY_OPTIONS = [
   "Open to discuss",
 ];
 
-// An empty draft, used before the profile has loaded.
 const emptyDraft: ApplicationDraft = {
   fullName: "",
   email: "",
@@ -56,9 +53,6 @@ const inputClass =
 const labelClass =
   "mb-[7px] block font-['Inter'] font-medium text-[13px] text-[#4B4757]";
 
-// Swaps the border color wholesale rather than appending a second border
-// class alongside it — two border-color utilities on one element race each
-// other in the generated CSS, so only one variant of the string is ever used.
 function fieldClass(hasError: boolean): string {
   return hasError
     ? inputClass
@@ -75,39 +69,24 @@ function FieldError({ message }: { message?: string }) {
 const Apply = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
-  // authLoading: whether AuthContext has finished checking the saved token
-  // yet. Without waiting on it, a genuinely logged-in candidate whose token
-  // check hasn't resolved yet would briefly be treated as a guest.
   const { isLoggedIn, loading: authLoading } = useAuth();
 
   const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Which of the four steps we're on, 0-based.
   const [step, setStep] = useState(0);
 
-  // Everything the wizard collects. One object rather than a dozen
-  // useStates, so passing it to the API at the end is a single line.
   const [draft, setDraft] = useState<ApplicationDraft>(emptyDraft);
 
-  // Did any of step 1 / step 2 come from the profile? Drives the little
-  // "Filled from your profile" badge.
   const [prefilled, setPrefilled] = useState(false);
 
   const [submitting, setSubmitting] = useState(false);
   const [uploadingCv, setUploadingCv] = useState(false);
 
-  // Field-level messages, set when "Continue" is blocked — cleared as each
-  // field is fixed. Keyed loosely since step 2's screening answers aren't a
-  // fixed set of names.
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Set once the application goes through — swaps the whole page for the
-  // success screen.
   const [submittedId, setSubmittedId] = useState<string | null>(null);
 
-  // A tiny helper so each input can update one field without rewriting
-  // the whole object by hand every time.
   function update<K extends keyof ApplicationDraft>(
     key: K,
     value: ApplicationDraft[K]
@@ -140,11 +119,6 @@ const Apply = () => {
     }
   }
 
-  // Load the job, and — only for a logged-in candidate — the profile
-  // prefill and whether they've already applied. A guest has no profile to
-  // prefill from and no account to check "already applied" against, and
-  // both of those calls 401 without a token, so they're skipped entirely
-  // rather than failing the whole Promise.all.
   useEffect(() => {
     if (!jobId || authLoading) return;
 
@@ -160,8 +134,6 @@ const Apply = () => {
 
         if (cancelled) return;
 
-        // Already applied — send them to their applications instead of
-        // letting them fill in a form that will be rejected.
         if (applied?.applied) {
           toast.info("You've already applied", jobData.title);
           navigate("/applications");
@@ -170,9 +142,6 @@ const Apply = () => {
 
         setJob(jobData);
 
-        // One empty answer slot per question the job actually asks — most
-        // jobs have none, in which case this is just an empty array and
-        // nothing new renders.
         const screeningAnswers = jobData.screeningQuestions.map((question) => ({
           question,
           answer: "",
@@ -182,13 +151,10 @@ const Apply = () => {
           setDraft((prev) => ({
             ...prev,
             ...prefill,
-            // Default the salary field to the job's own range, as a starting
-            // point the candidate can edit.
             expectedSalary: formatRange(jobData),
             screeningAnswers,
           }));
 
-          // If we got a name and email back, step 1 is already filled in.
           setPrefilled(Boolean(prefill.fullName && prefill.email));
         } else {
           setDraft((prev) => ({
@@ -206,8 +172,6 @@ const Apply = () => {
 
     load();
 
-    // Cleanup: if the user navigates away mid-load, don't set state on a
-    // component that's no longer on screen.
     return () => {
       cancelled = true;
     };
@@ -226,9 +190,6 @@ const Apply = () => {
     setUploadingCv(true);
 
     try {
-      // Uploading here also updates their profile CV, which is what
-      // "Upload a different CV for this role" implies — it becomes the
-      // CV on file from now on.
       const profile = await uploadMyCv(file);
 
       update("cvUrl", profile.cvUrl);
@@ -244,8 +205,6 @@ const Apply = () => {
     }
   }
 
-  // Each step decides for itself what's required, and builds its own
-  // field-level error messages when something's missing.
   function stepErrors(): Record<string, string> {
     if (step === 0) {
       const next: Record<string, string> = {};
@@ -320,7 +279,6 @@ const Apply = () => {
     );
   }
 
-  // Once submitted, the wizard is done — show the confirmation instead.
   if (submittedId) {
     return <ApplySubmitted job={job} applicationId={submittedId} />;
   }
@@ -328,7 +286,6 @@ const Apply = () => {
   return (
     <ApplyLayout job={job} currentStep={step}>
       <div className="mt-[24px] rounded-[22px] border-[1.07px] border-[#ECEBF0] bg-white p-6 sm:p-[30px]">
-        {/* ---------------- STEP 1 — Your details ---------------- */}
         {step === 0 && (
           <>
             <h1 className="font-['Bricolage_Grotesque'] font-extrabold text-[26px] leading-[34px] tracking-[-0.8px] text-[#161320]">
@@ -389,7 +346,6 @@ const Apply = () => {
           </>
         )}
 
-        {/* ---------------- STEP 2 — CV & links ---------------- */}
         {step === 1 && (
           <>
             <h1 className="font-['Bricolage_Grotesque'] font-extrabold text-[26px] leading-[34px] tracking-[-0.8px] text-[#161320]">
@@ -400,7 +356,6 @@ const Apply = () => {
               default.
             </p>
 
-            {/* The CV on file */}
             {draft.cvOriginalName ? (
               <div className="mt-[20px] flex items-center gap-[14px] rounded-[14px] border-[1.5px] border-[#6D4AFF] bg-[#F7F4FF] p-[14px]">
                 <span className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-[10px] bg-[#EDE7FF] text-[#6D4AFF]">
@@ -416,7 +371,6 @@ const Apply = () => {
                   </div>
                 </div>
 
-                {/* A filled dot showing this one is selected */}
                 <span className="flex h-[16px] w-[16px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-[#6D4AFF]">
                   <span className="h-[7px] w-[7px] rounded-full bg-[#6D4AFF]" />
                 </span>
@@ -427,8 +381,6 @@ const Apply = () => {
               </div>
             )}
 
-            {/* A hidden file input driven by a label, because the browser's
-                default file picker button can't be styled. */}
             <label className="mt-[12px] inline-block cursor-pointer font-['Inter'] text-[12.5px] text-[#6D4AFF] underline">
               {uploadingCv
                 ? "Uploading…"
@@ -468,7 +420,6 @@ const Apply = () => {
           </>
         )}
 
-        {/* ---------------- STEP 3 — Questions ---------------- */}
         {step === 2 && (
           <>
             <h1 className="font-['Bricolage_Grotesque'] font-extrabold text-[26px] leading-[34px] tracking-[-0.8px] text-[#161320]">
@@ -539,15 +490,12 @@ const Apply = () => {
                       : "border-[#ECEBF0] focus:border-[#6D4AFF]"
                   }`}
                 />
-                {/* A live character count, so nobody hits the limit blind */}
                 <div className="mt-[4px] text-right font-['Inter'] text-[11px] text-[#8B8798]">
                   {draft.whyThisRole.length} / 600
                 </div>
                 <FieldError message={errors.whyThisRole} />
               </div>
 
-              {/* This job's own screening questions, if it has any — set
-                  by whoever posted it, so most jobs show nothing here. */}
               {draft.screeningAnswers.map((entry, index) => (
                 <div key={index}>
                   <label className={labelClass}>
@@ -570,7 +518,6 @@ const Apply = () => {
           </>
         )}
 
-        {/* ---------------- STEP 4 — Review & submit ---------------- */}
         {step === 3 && (
           <>
             <h1 className="font-['Bricolage_Grotesque'] font-extrabold text-[26px] leading-[34px] tracking-[-0.8px] text-[#161320]">
@@ -623,7 +570,6 @@ const Apply = () => {
                 />
               )}
 
-              {/* The promise the whole product is built on */}
               <div className="rounded-[16px] bg-[#140A28] p-5">
                 <span className="font-['Inter'] font-semibold text-[9.5px] tracking-[0.6px] uppercase text-[#FFC93C]">
                   Reviewed by a human
@@ -639,7 +585,6 @@ const Apply = () => {
         )}
       </div>
 
-      {/* Footer buttons — same row on every step, different labels */}
       <div className="mt-[22px] flex items-center justify-between gap-4">
         {step > 0 ? (
           <button
@@ -650,8 +595,6 @@ const Apply = () => {
             Back
           </button>
         ) : (
-          // An empty span keeps "Continue" pushed to the right on step 1,
-          // where there's no Back button to balance it.
           <span />
         )}
 
@@ -678,10 +621,6 @@ const Apply = () => {
   );
 };
 
-// ---------------------------------------------------------------------------
-// One summary card on the review step. Kept here rather than in its own file
-// because nothing outside this page uses it.
-// ---------------------------------------------------------------------------
 type ReviewCardProps = {
   title: string;
   onEdit: () => void;
@@ -709,8 +648,6 @@ const ReviewCard = ({ title, onEdit, rows }: ReviewCardProps) => (
           <span className="shrink-0 font-['Inter'] text-[13px] text-[#8B8798]">
             {label}
           </span>
-          {/* An em dash when a field was left blank, so the row still reads
-              as intentional rather than looking broken. */}
           <span className="text-right font-['Inter'] font-medium text-[13px] text-[#161320]">
             {value?.trim() ? value : "—"}
           </span>

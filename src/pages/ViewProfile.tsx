@@ -24,9 +24,6 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-// A labeled value, or a muted "Not added yet" placeholder — used all over
-// this page so an incomplete profile still reads cleanly instead of
-// showing blank space.
 function Field({ label, value }: { label: string; value: string }) {
   return (
     <div>
@@ -97,7 +94,6 @@ const ViewProfile = () => {
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.7fr_1fr] mb-24 lg:mb-[100px]">
-          {/* Main column */}
           <div className="flex flex-col gap-6">
             <ProfileSection icon={FiUser} title="The basics">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -206,7 +202,6 @@ const ViewProfile = () => {
             </ProfileSection>
           </div>
 
-          {/* Sidebar */}
           <div className="flex flex-col gap-6 lg:sticky lg:top-6 lg:self-start">
             <ProfileProgressCard profile={profile} />
 

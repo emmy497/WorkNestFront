@@ -4,8 +4,6 @@ export interface DashboardStat {
   value: number;
   change: number;
   changeLabel: string;
-  // When true, `change` is a percentage (e.g. "+12% this month") instead of
-  // a plain count (e.g. "+3 vs last week").
   changeIsPercent?: boolean;
 }
 
@@ -38,7 +36,7 @@ export interface RecentApplication {
   jobTitle: string;
   companyName: string;
   status: ApplicationStatus;
-  appliedAt: string; // ISO date string
+  appliedAt: string;
 }
 
 export interface ClosingJob {
@@ -47,7 +45,7 @@ export interface ClosingJob {
   companyName: string;
   location: string;
   workArrangement: string;
-  closesAt: string; // ISO date string
+  closesAt: string;
   applicantCount: number;
 }
 

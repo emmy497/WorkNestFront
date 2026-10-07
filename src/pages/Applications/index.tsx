@@ -25,9 +25,6 @@ const TABS: { key: Tab; label: string }[] = [
   { key: "notifications", label: "Notifications" },
 ];
 
-// True when an ISO date string falls on today's calendar day — used to
-// split notifications into the "Today" / "Earlier" groups the design calls
-// for, rather than a rolling 24-hour window.
 function isToday(isoDate: string): boolean {
   const date = new Date(isoDate);
   const now = new Date();
@@ -46,8 +43,6 @@ const Applications = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // The shared saved-jobs state. We use savedCount for the tab badge, and
-  // savedIds so the list refreshes when a bookmark is removed from here.
   const { savedCount, savedIds } = useSavedJobs();
 
   const [savedJobs, setSavedJobs] = useState<Job[]>([]);
@@ -59,9 +54,6 @@ const Applications = () => {
   const [notifLoading, setNotifLoading] = useState(true);
   const [notifError, setNotifError] = useState("");
 
-  // Fetched eagerly (not just when the tab is opened) so the tab badge
-  // shows the right unread count right away — same reasoning as
-  // applications/savedJobs above.
   useEffect(() => {
     fetchNotifications()
       .then((data) => {
@@ -79,7 +71,6 @@ const Applications = () => {
       );
       setUnreadCount((prev) => Math.max(0, prev - 1));
       markNotificationRead(notification.id).catch(() => {
-        // Best-effort — worst case it shows as unread again on next load.
       });
     }
 
@@ -92,7 +83,6 @@ const Applications = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
     setUnreadCount(0);
     markAllNotificationsRead().catch(() => {
-      // Best-effort, same as above.
     });
   }
 
@@ -103,11 +93,6 @@ const Applications = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  // Reload the saved list whenever the set of saved ids changes.
-  //
-  // savedIds.size is the dependency rather than savedIds itself, because the
-  // Set is a new object on every change — depending on it directly would
-  // re-run this effect constantly.
   useEffect(() => {
     setSavedLoading(true);
     fetchSavedJobs()
@@ -122,9 +107,6 @@ const Applications = () => {
   const shortlistedCount = applications.filter((app) => app.status === "shortlisted").length;
   const interviewCount = applications.filter((app) => app.status === "interview").length;
 
-  // The Notifications badge shows how many are UNREAD, unlike the other two
-  // tabs (which show a total count) — that's what people expect from a
-  // notifications badge.
   const tabCounts: Record<Tab, number> = {
     applications: applications.length,
     saved: savedCount,
@@ -144,7 +126,6 @@ const Applications = () => {
             Applications
           </div>
 
-          {/* tabs */}
           <div className="flex gap-[28px] border-b-[1.07px] border-b-[#ECEBF0]">
             {TABS.map((tab) => (
               <button
@@ -174,7 +155,6 @@ const Applications = () => {
 
         {activeTab === "applications" && (
           <section className="mb-24 lg:mb-[140px]">
-            {/* stat cards */}
             <div className="mb-[28px] flex flex-wrap gap-[16px]">
               {[
                 { label: "Active", value: activeCount },
@@ -195,7 +175,6 @@ const Applications = () => {
               ))}
             </div>
 
-            {/* list — three possible states: loading, error, or data */}
             {loading ? (
               <div className="rounded-[24px] border-[1.07px] border-[#ECEBF0] bg-[#FAFAFB] p-10 text-center font-['Inter'] text-[13.5px] text-[#4B4757]">
                 Loading your applications…
@@ -228,8 +207,6 @@ const Applications = () => {
 
         {activeTab === "saved" && (
           <section className="mb-24 lg:mb-[140px]">
-            {/* Same three states as the applications list: loading, error,
-                or data — plus an empty state when nothing is saved yet. */}
             {savedLoading ? (
               <div className="rounded-[24px] border-[1.07px] border-[#ECEBF0] bg-[#FAFAFB] p-10 text-center font-['Inter'] text-[13.5px] text-[#4B4757]">
                 Loading your saved jobs…
@@ -259,9 +236,6 @@ const Applications = () => {
                 </NavLink>
               </div>
             ) : (
-              // Reusing JobCard means saved jobs look identical to the
-              // Find Jobs list, bookmark and all — tapping it here removes
-              // the job and the list updates on its own.
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-[22px]">
                 {savedJobs.map((job) => (
                   <JobCard key={job.id} job={job} showDescription={false} />

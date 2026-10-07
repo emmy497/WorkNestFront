@@ -1,9 +1,6 @@
 import type { Application } from "../types/application";
 import type { Job } from "../types/job";
 
-// A minimal stand-in Job for each application card. Only the fields the
-// ApplicationCard / job-details link actually need are filled in with real
-// values — the rest just satisfy the Job type.
 function stubJob(overrides: Pick<Job, "id" | "companyName" | "title">): Job {
   return {
     companyLogo: "/images/moniepoint_group_icon.svg",
@@ -26,9 +23,6 @@ function stubJob(overrides: Pick<Job, "id" | "companyName" | "title">): Job {
   };
 }
 
-// TODO: replace with a real API call (e.g. GET /api/applications) once the
-// backend has an endpoint for it. Keep the `Application` shape in
-// ../types/application.ts in sync with whatever the API actually returns.
 export const mockApplications: Application[] = [
   {
     id: "app-1",

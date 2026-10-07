@@ -7,34 +7,23 @@ import { NeedsVerificationError } from "../api/auth";
 import { toast } from "../lib/toast";
 
 const Login = () => {
-  // Grab the login function from our AuthContext.
   const { login, loginWithGoogle } = useAuth();
 
-  // Lets us send the user to another page after a successful login.
   const navigate = useNavigate();
 
-  // The reset-password flow sends a success message here when it finishes.
-  // The Apply-gate modal sends `from` — where to land after logging in,
-  // e.g. back on the job application that prompted the login.
   const location = useLocation();
   const state = location.state as { notice?: string; from?: string } | null;
   const noticeFromRedirect = state?.notice;
   const from = state?.from || "/find-jobs";
 
-  // Controlled inputs: React state holds the value, not the DOM.
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // Inline, field-level messages — set on a failed submit attempt, cleared
-  // the moment that field is edited again.
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
   const [submitting, setSubmitting] = useState(false);
   const [googleSubmitting, setGoogleSubmitting] = useState(false);
 
-  // Fires when Google hands back an access token from the popup. Google has
-  // already confirmed the user's identity — we just pass the token on to
-  // our server, which double-checks it before trusting it.
   const signInWithGoogle = useGoogleLogin({
     flow: "implicit",
     onSuccess: async (tokenResponse) => {
@@ -58,9 +47,6 @@ const Login = () => {
     },
   });
 
-  // Show the "Password updated" message from the reset flow as a toast.
-  // It's in a useEffect so it fires once when the page loads, not on
-  // every re-render.
   useEffect(() => {
     if (noticeFromRedirect) {
       toast.success(noticeFromRedirect);
@@ -68,8 +54,6 @@ const Login = () => {
   }, [noticeFromRedirect]);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    // Stops the browser reloading the page, which is its default
-    // behaviour for a form submit.
     e.preventDefault();
 
     const nextErrors: typeof errors = {};
@@ -84,25 +68,19 @@ const Login = () => {
     try {
       await login(email, password);
       toast.success("Welcome back");
-      navigate(from); // logged in — back to wherever they were headed
+      navigate(from);
     } catch (err) {
-      // Special case: the password was right, but they never confirmed
-      // their email. Send them straight to the verify page instead of
-      // leaving them stuck on an error message.
       if (err instanceof NeedsVerificationError) {
         toast.info("Verify your email", "We sent you a new code.");
         navigate("/verify-email", { state: { email: err.email, from } });
         return;
       }
 
-      // Our api/auth.ts throws an Error carrying the server's message,
-      // so this shows "Invalid email or password" rather than something generic.
       toast.error(
         "Could not sign you in",
         err instanceof Error ? err.message : undefined
       );
     } finally {
-      // Runs whether it worked or failed, so the button never stays stuck.
       setSubmitting(false);
     }
   }
@@ -123,7 +101,6 @@ const Login = () => {
           </div>
         </div>
 
-        {/* email and password input */}
         <div>
           <div>
             <div className="mb-[8px] font-medium text-[13.66px] leading-[20.48px] text-[#4B4757]">
@@ -175,11 +152,7 @@ const Login = () => {
           </NavLink>
         </div>
 
-        {/* Sign in and google buttons */}
         <div>
-          {/* A success message passed over from the reset-password flow */}
-          {/* Messages now appear as toasts instead of inline text —
-              see handleSubmit above. */}
           <button
             type="submit"
             disabled={submitting}
@@ -188,14 +161,12 @@ const Login = () => {
             {submitting ? "Signing in..." : "Sign in"}
           </button>
 
-          {/* or */}
           <div className="flex items-center gap-[5px] mb-[15px]">
             <div className="h-[2.08px] flex-1 bg-[linear-gradient(90deg,rgba(135,135,137,0)_11.88%,#878789_100%)]" />
             <span className="font-normal text-[12px] text-[#878789]">Or</span>
             <div className="h-[2.08px] flex-1 bg-[linear-gradient(270deg,rgba(135,135,137,0)_11.88%,#878789_100%)]" />
           </div>
 
-          {/* Google button */}
           <button
             type="button"
             onClick={() => signInWithGoogle()}
@@ -213,7 +184,6 @@ const Login = () => {
           </button>
         </div>
 
-        {/* Create Account */}
         <div className="flex flex-wrap items-center justify-center gap-[8px]">
           <div className="font-normal text-[12px] text-[#878789]">
             Don't have an account?

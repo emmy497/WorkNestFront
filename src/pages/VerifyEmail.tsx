@@ -8,8 +8,6 @@ import { toast } from "../lib/toast";
 
 const RESEND_COOLDOWN_SECONDS = 30;
 
-// "john@gmail.com" -> "j***@gmail.com" — enough to confirm it's the right
-// inbox without showing the full address on screen.
 function maskEmail(rawEmail: string) {
   const [local, domain] = rawEmail.split("@");
   if (!local || !domain) return rawEmail;
@@ -26,16 +24,11 @@ const VerifyEmail = () => {
   const { verifyEmail } = useAuth();
   const navigate = useNavigate();
 
-  // The SignUp (and Login, for the "needs verification" case) pages send
-  // the email — and possibly a `from` to return to afterwards — across
-  // when they navigate here. We read both back out of location.state.
   const location = useLocation();
   const routeState = location.state as { email?: string; from?: string } | null;
   const emailFromSignup = routeState?.email;
   const from = routeState?.from || "/find-jobs";
 
-  // If someone lands here directly with no email in the state, we let them
-  // type it in rather than showing a broken page.
   const [email, setEmail] = useState(emailFromSignup || "");
   const [otp, setOtp] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -68,7 +61,6 @@ const VerifyEmail = () => {
 
     try {
       await verifyEmail(email, otp);
-      // Verified and logged in — back to wherever they were headed.
       navigate(from);
     } catch (err) {
       toast.error(
@@ -85,7 +77,7 @@ const VerifyEmail = () => {
     try {
       const data = await resendOtpRequest(email);
       toast.info(data.message);
-      setOtp(""); // clear the old code from the box
+      setOtp("");
       setSecondsLeft(RESEND_COOLDOWN_SECONDS);
     } catch (err) {
       toast.error(
@@ -115,7 +107,6 @@ const VerifyEmail = () => {
           </div>
         </div>
 
-        {/* Only shown if they arrived here without an email attached */}
         {!emailFromSignup && (
           <div>
             <div className="mb-[8px] font-medium text-[13.66px] leading-[20.48px] text-[#4B4757]">

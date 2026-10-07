@@ -1,18 +1,12 @@
 import { FaStar } from "react-icons/fa";
 
 interface StarRatingProps {
-  value: number; // 0-5
+  value: number;
   max?: number;
-  // Omit to render a read-only display (e.g. inside a candidate-facing
-  // summary). Pass it to make the stars clickable.
   onChange?: (value: number) => void;
-  size?: number; // px
+  size?: number;
 }
 
-// A row of 5 stars, filled up to `value`. Used both as a read-only display
-// and, when `onChange` is given, as the actual rating input on the review
-// screen — one component instead of two so they can never visually drift
-// apart.
 const StarRating = ({ value, max = 5, onChange, size = 16 }: StarRatingProps) => {
   const stars = Array.from({ length: max }, (_, i) => i + 1);
   const interactive = Boolean(onChange);

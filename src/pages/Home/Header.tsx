@@ -18,10 +18,6 @@ const Header = () => {
         <Navbar />
 
         <section className="relative mt-10 lg:mt-[75px]">
-          {/* Left group of floating photos — desktop only.
-              Each one fades in slightly after the one before it. The delay is
-              an inline style because it's a different number every time, and
-              Tailwind can only generate classes it can see written out. */}
           <div className="absolute left-0 top-[148px] h-[148px] w-[118px]">
             <img
               src="/images/Photo-Card-1.png"
@@ -43,7 +39,6 @@ const Header = () => {
             />
           </div>
 
-          {/* Right group of floating photos — desktop only */}
           <div className="absolute right-0 top-[148px] h-[148px] w-[118px]">
             <img
               src="/images/Photo-Card-4.png"
@@ -65,7 +60,6 @@ const Header = () => {
             />
           </div>
 
-          {/* Centered hero content */}
           <div className="relative z-10 mx-auto mt-6 w-full max-w-[680px] text-center lg:mt-[24px]  lg:pb-[41px]">
             <span className="inline-block h-[31px] rounded-full bg-white px-4 py-2 text-[10px] font-semibold text-violet-600 shadow-sm sm:text-xs">
               A HIRING HUB, NOT A JOB BOARD

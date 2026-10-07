@@ -6,9 +6,6 @@ type NotificationsResponse = {
   unreadCount: number;
 };
 
-// ---------------------------------------------------------------------------
-// GET /api/notifications
-// ---------------------------------------------------------------------------
 export async function fetchNotifications(): Promise<NotificationsResponse> {
   try {
     const res = await apiClient.get<NotificationsResponse>("/notifications");
@@ -18,9 +15,6 @@ export async function fetchNotifications(): Promise<NotificationsResponse> {
   }
 }
 
-// ---------------------------------------------------------------------------
-// PATCH /api/notifications/:id/read
-// ---------------------------------------------------------------------------
 export async function markNotificationRead(id: string): Promise<void> {
   try {
     await apiClient.patch(`/notifications/${id}/read`);
@@ -29,9 +23,6 @@ export async function markNotificationRead(id: string): Promise<void> {
   }
 }
 
-// ---------------------------------------------------------------------------
-// PATCH /api/notifications/read-all
-// ---------------------------------------------------------------------------
 export async function markAllNotificationsRead(): Promise<void> {
   try {
     await apiClient.patch("/notifications/read-all");

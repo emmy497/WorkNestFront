@@ -18,11 +18,6 @@ function formatCountdown(totalSeconds: number) {
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }
 
-// This page has three steps, and we swap between them with state instead of
-// using three separate routes:
-//   "email" -> ask for the email address, send the code
-//   "otp"   -> enter the code, confirm it's correct
-//   "reset" -> only shown once the code is verified, choose a new password
 type Step = "email" | "otp" | "reset";
 
 const ForgotPassword = () => {
@@ -55,7 +50,6 @@ const ForgotPassword = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // --- STEP 1: send the code -----------------------------------------------
   async function handleSendCode(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -68,9 +62,6 @@ const ForgotPassword = () => {
     setSubmitting(true);
 
     try {
-      // Note: this succeeds even if the email isn't registered. The server
-      // replies the same way on purpose, so nobody can use this page to
-      // find out who has an account.
       await forgotPasswordRequest(email);
       setStep("otp");
       setSecondsLeft(RESEND_COOLDOWN_SECONDS);
@@ -81,7 +72,6 @@ const ForgotPassword = () => {
     }
   }
 
-  // --- STEP 2: confirm the code is right, without resetting anything yet ---
   async function handleVerifyOtp(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -110,8 +100,6 @@ const ForgotPassword = () => {
     setResending(true);
 
     try {
-      // Reuses the same request as step 1 — this is what actually issues a
-      // fresh "reset-password" code. (resend-otp is only for verify-email.)
       const data = await forgotPasswordRequest(email);
       toast.info(data.message);
       setOtp("");
@@ -125,7 +113,6 @@ const ForgotPassword = () => {
     }
   }
 
-  // --- STEP 3: use the verified code to set a new password ------------------
   async function handleReset(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 

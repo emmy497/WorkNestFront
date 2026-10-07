@@ -7,8 +7,6 @@ type ProfileSectionProps = {
   children: ReactNode;
 };
 
-// The repeated "card with an icon badge and a title" wrapper used by every
-// section of the edit-profile page — The basics, Experience, Skills, etc.
 const ProfileSection = ({ icon: Icon, title, children }: ProfileSectionProps) => {
   return (
     <div className="rounded-[16px] border-[1.07px] border-[#ECEBF0] bg-white p-6">

@@ -13,9 +13,6 @@ export type ProfileSectionStatus = {
   complete: boolean;
 };
 
-// One check per section, matching the five cards on the edit-profile page.
-// Each section is worth an equal fifth of the total — simple, and it means
-// the checklist and the percentage never disagree with each other.
 export function getProfileSections(
   profile: Pick<
     Profile,
