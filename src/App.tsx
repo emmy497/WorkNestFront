@@ -17,6 +17,7 @@ import Jobs from "./pages/Admin/Jobs";
 import JobEditor from "./pages/Admin/JobEditor";
 import Clients from "./pages/Admin/Clients";
 import ClientDetail from "./pages/Admin/ClientDetail";
+import Candidates from "./pages/Admin/Candidates";
 import Pipeline from "./pages/Admin/Pipeline";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ScrollToTop from "./components/ScrollToTop";
@@ -74,6 +75,7 @@ function App() {
           <Route path="jobs/new" element={<JobEditor />} />
           <Route path="clients" element={<Clients />} />
           <Route path="clients/:id" element={<ClientDetail />} />
+          <Route path="candidates" element={<Candidates />} />
           <Route path="pipeline" element={<Pipeline />} />
           <Route path="pipeline/:id" element={<Pipeline />} />
         </Route>
