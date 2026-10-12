@@ -142,7 +142,7 @@ const Apply = () => {
 
         setJob(jobData);
 
-        const screeningAnswers = jobData.screeningQuestions.map((question) => ({
+        const screeningAnswers = (jobData.screeningQuestions ?? []).map((question) => ({
           question,
           answer: "",
         }));
