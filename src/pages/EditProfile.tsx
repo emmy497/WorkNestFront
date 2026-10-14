@@ -76,7 +76,11 @@ const EditProfile = () => {
     setUploadingCv(true);
     try {
       const updated = await uploadMyCv(file);
-      setProfile(updated);
+      setProfile((prev) =>
+        prev
+          ? { ...prev, cvUrl: updated.cvUrl, cvOriginalName: updated.cvOriginalName }
+          : updated
+      );
       setNotice("CV uploaded.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not upload your CV");
