@@ -1,5 +1,4 @@
 import { useOutletContext } from "react-router-dom";
-import { toast } from "react-toastify";
 import {
   FiBriefcase,
   FiUsers,
@@ -10,6 +9,7 @@ import {
   FiDownload,
 } from "react-icons/fi";
 import type { AdminOutletContext } from "../AdminLayout";
+import type { DashboardOverview } from "../../../types/dashboard";
 import StatCard from "./StatCard";
 import RecentApplications from "./RecentApplications";
 import ApplicationsByStatus from "./ApplicationsByStatus";
@@ -23,6 +23,46 @@ const TODAY = new Date().toLocaleDateString(undefined, {
   month: "long",
   year: "numeric",
 });
+
+function csvCell(value: string | number): string {
+  const text = String(value);
+  return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+}
+
+function downloadOverviewCsv(overview: DashboardOverview) {
+  const s = overview.stats;
+  const rows: (string | number)[][] = [
+    ["WorkNest overview", new Date().toISOString().slice(0, 10)],
+    [],
+    ["Metric", "Value", "Change", "Period"],
+    ["Active jobs", s.activeJobs.value, s.activeJobs.change, s.activeJobs.changeLabel],
+    ["Registered candidates", s.registeredCandidates.value, s.registeredCandidates.change, s.registeredCandidates.changeLabel],
+    ["Applications received", s.applicationsReceived.value, s.applicationsReceived.change, s.applicationsReceived.changeLabel],
+    ["Shortlisted", s.shortlisted.value, s.shortlisted.change, s.shortlisted.changeLabel],
+    ["Interviews scheduled", s.interviewsScheduled.value, s.interviewsScheduled.change, s.interviewsScheduled.changeLabel],
+    ["Placements made", s.placementsMade.value, s.placementsMade.change, s.placementsMade.changeLabel],
+    [],
+    ["Applications by status", "Count"],
+    ...overview.applicationsByStatus.map((row) => [row.label, row.count]),
+    [],
+    ["Recent applications", "Role", "Company", "Status", "Applied"],
+    ...overview.recentApplications.map((app) => [app.candidateName, app.jobTitle, app.companyName, app.status, app.appliedAt.slice(0, 10)]),
+    [],
+    ["Jobs closing soon", "Company", "Closes", "Applicants"],
+    ...overview.jobsClosingSoon.map((job) => [job.title, job.companyName, job.closesAt.slice(0, 10), job.applicantCount]),
+    [],
+    ["Most applied roles", "Company", "Applications"],
+    ...overview.mostAppliedRoles.map((role) => [role.title, role.companyName, role.count]),
+  ];
+
+  const csv = rows.map((row) => row.map(csvCell).join(",")).join("\n");
+  const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `worknest-overview-${new Date().toISOString().slice(0, 10)}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
+}
 
 const Overview = () => {
   const { overview, loading, error } = useOutletContext<AdminOutletContext>();
@@ -66,7 +106,7 @@ const Overview = () => {
         </div>
         <button
           type="button"
-          onClick={() => toast.info("Coming soon!")}
+          onClick={() => downloadOverviewCsv(overview)}
           className="flex shrink-0 items-center gap-[8px] rounded-[10px] border-[1.07px] border-[#ECEBF0] bg-white px-[16px] py-[10px] font-['Inter'] text-[13.5px] font-semibold text-[#4B4757] hover:bg-[#FAFAFB]"
         >
           <FiDownload className="size-[15px]" />

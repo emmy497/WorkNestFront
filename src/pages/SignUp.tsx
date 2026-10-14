@@ -98,7 +98,7 @@ const SignUp = () => {
       >
         <div className="text-start">
           <div className="font-extrabold text-[24px] leading-[34px] sm:text-[32px] sm:leading-[47.1px] tracking-[-1.39px] text-[#161320]">
-            Create you account
+            Create your account
           </div>
           <div className="font-normal text-[14px] leading-[22px] sm:text-[16px] sm:leading-[24px] tracking-[-0.5px] text-[#4C4C4F]">
             Set up your profile once and start applying to real roles.
@@ -223,6 +223,12 @@ const SignUp = () => {
           >
             {submitting ? "Creating account..." : "Create account"}
           </button>
+
+          <p className="mb-[15px] text-center font-['Inter'] text-[12px] leading-[18px] text-[#878789]">
+            By creating an account, you agree to our{" "}
+            <NavLink to="/terms" className="text-[#6D4AFF] underline">Terms of Service</NavLink> and{" "}
+            <NavLink to="/privacy" className="text-[#6D4AFF] underline">Privacy Policy</NavLink>.
+          </p>
 
           <div className="flex items-center gap-[5px] mb-[15px]">
             <div className="h-[2.08px] flex-1 bg-[linear-gradient(90deg,rgba(135,135,137,0)_11.88%,#878789_100%)]" />

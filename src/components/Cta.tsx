@@ -1,7 +1,10 @@
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 
 const Cta = () => {
+  const { isLoggedIn } = useAuth();
+
   return (
     <section className="px-4 sm:px-8 md:px-16 lg:px-[100px]">
       <div className="relative w-full overflow-hidden rounded-[24px] lg:rounded-[35px] bg-[#140A28] px-6 py-16 sm:px-10 sm:py-20 md:px-16 md:py-24 lg:px-[140px] lg:py-[130px]">
@@ -33,7 +36,7 @@ const Cta = () => {
           </div>
 
           <Link
-            to="/profile/edit"
+            to={isLoggedIn ? "/profile/edit" : "/signup"}
             className="mt-6 lg:mt-[24px] block mx-auto w-full max-w-[213px] text-center rounded-[999px] bg-[hsla(43,100%,62%,1)] px-6 py-[14px] lg:px-[34px] lg:py-[16px] font-['Inter'] font-medium text-[15px] lg:text-base text-[#463400] shadow-[0px_10px_30px_0px_hsla(43,100%,62%,0.4)]"
           >
             Create your profile

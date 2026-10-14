@@ -21,6 +21,14 @@ import Candidates from "./pages/Admin/Candidates";
 import Pipeline from "./pages/Admin/Pipeline";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ScrollToTop from "./components/ScrollToTop";
+import Terms from "./pages/Info/Terms";
+import Privacy from "./pages/Info/Privacy";
+import About from "./pages/Info/About";
+import ForCompanies from "./pages/Info/ForCompanies";
+import Contact from "./pages/Info/Contact";
+import NotFound from "./pages/NotFound";
+import AdminNotifications from "./pages/Admin/Notifications";
+import AdminSettings from "./pages/Admin/Settings";
 
 function App() {
   return (
@@ -35,6 +43,11 @@ function App() {
         <Route path="/find-jobs" element={<FindJobs />} />
         <Route path="/job-details/:jobId" element={<JobDetails />} />
         <Route path="/apply/:jobId" element={<Apply />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/for-companies" element={<ForCompanies />} />
+        <Route path="/contact" element={<Contact />} />
         <Route
           path="/profile"
           element={
@@ -78,7 +91,12 @@ function App() {
           <Route path="candidates" element={<Candidates />} />
           <Route path="pipeline" element={<Pipeline />} />
           <Route path="pipeline/:id" element={<Pipeline />} />
+          <Route path="notifications" element={<AdminNotifications />} />
+          <Route path="settings" element={<AdminSettings />} />
+          <Route path="*" element={<Navigate to="/admin" replace />} />
         </Route>
+
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   );

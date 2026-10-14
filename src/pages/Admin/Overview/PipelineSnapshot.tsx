@@ -1,4 +1,4 @@
-import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import type { StatusBreakdown } from "../../../types/dashboard";
 import { APPLICATION_STATUS_CONFIG } from "../../../types/application";
 
@@ -7,6 +7,7 @@ interface PipelineSnapshotProps {
 }
 
 const PipelineSnapshot = ({ pipeline }: PipelineSnapshotProps) => {
+  const navigate = useNavigate();
   const max = Math.max(1, ...pipeline.map((row) => row.count));
   const MIN_WIDTH = 14;
 
@@ -18,7 +19,7 @@ const PipelineSnapshot = ({ pipeline }: PipelineSnapshotProps) => {
         </h2>
         <button
           type="button"
-          onClick={() => toast.info("Coming soon!")}
+          onClick={() => navigate("/admin/pipeline")}
           className="font-['Inter'] text-[13px] font-semibold text-[#6D4AFF] hover:underline"
         >
           Open →

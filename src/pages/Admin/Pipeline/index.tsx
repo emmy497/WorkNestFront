@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { FiChevronDown } from "react-icons/fi";
 import { FaStar } from "react-icons/fa";
 import type { AdminApplicationListItem, ApplicationStatus } from "../../../types/application";
 import { APPLICATION_STATUS_CONFIG } from "../../../types/application";
-import { fetchAdminApplications } from "../../../api/adminApplications";
+import { fetchAdminApplications, updateApplicationStatus } from "../../../api/adminApplications";
+import { toast } from "../../../lib/toast";
 import { formatShortRelativeTime } from "../../../utils/formatShortRelativeTime";
 import ApplicationReview from "./ApplicationReview";
 
@@ -57,10 +58,13 @@ const Pipeline = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+  const [searchParams] = useSearchParams();
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(searchParams.get("job"));
   const [roleMenuOpen, setRoleMenuOpen] = useState(false);
   const [filter, setFilter] = useState<FilterTab>("all");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkStatus, setBulkStatus] = useState<ApplicationStatus>("review");
+  const [bulkSaving, setBulkSaving] = useState(false);
 
   useEffect(() => {
     fetchAdminApplications()
@@ -126,6 +130,26 @@ const Pipeline = () => {
       else next.add(id);
       return next;
     });
+  }
+
+  async function applyBulkStatus() {
+    const ids = Array.from(selectedIds);
+    if (ids.length === 0) return;
+
+    setBulkSaving(true);
+    const results = await Promise.allSettled(ids.map((id) => updateApplicationStatus(id, bulkStatus)));
+    const succeeded = new Set(ids.filter((_, i) => results[i].status === "fulfilled"));
+    const failed = ids.length - succeeded.size;
+
+    setApplications((prev) => prev.map((app) => (succeeded.has(app.id) ? { ...app, status: bulkStatus } : app)));
+    setSelectedIds(new Set());
+    setBulkSaving(false);
+
+    const label = APPLICATION_STATUS_CONFIG[bulkStatus].label;
+    if (succeeded.size > 0) {
+      toast.success(`Moved ${succeeded.size} ${succeeded.size === 1 ? "candidate" : "candidates"} to ${label}`);
+    }
+    if (failed > 0) toast.error(`${failed} could not be updated`);
   }
 
   function toggleSelectAll() {
@@ -226,6 +250,41 @@ const Pipeline = () => {
             No applications here yet.
           </p>
         ) : (
+          <>
+          {selectedIds.size > 0 && (
+            <div className="mb-[14px] flex flex-wrap items-center gap-[10px] rounded-[12px] bg-[#F7F4FF] px-[14px] py-[10px]">
+              <span className="font-['Inter'] text-[13px] font-semibold text-[#161320]">
+                {selectedIds.size} selected
+              </span>
+              <span className="font-['Inter'] text-[13px] text-[#4B4757]">Move to</span>
+              <select
+                value={bulkStatus}
+                onChange={(e) => setBulkStatus(e.target.value as ApplicationStatus)}
+                className="rounded-[10px] border-[1.07px] border-[#ECEBF0] bg-white px-[10px] py-[6px] font-['Inter'] text-[13px] text-[#161320] outline-none focus:border-[#6D4AFF]"
+              >
+                {(Object.keys(APPLICATION_STATUS_CONFIG) as ApplicationStatus[]).map((status) => (
+                  <option key={status} value={status}>
+                    {APPLICATION_STATUS_CONFIG[status].label}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={applyBulkStatus}
+                disabled={bulkSaving}
+                className="rounded-full bg-[#6D4AFF] px-[14px] py-[7px] font-['Inter'] text-[13px] font-semibold text-white hover:bg-[#5D3CE0] disabled:opacity-60"
+              >
+                {bulkSaving ? "Updating…" : "Apply"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedIds(new Set())}
+                className="font-['Inter'] text-[13px] text-[#8B8798] hover:text-[#161320]"
+              >
+                Clear
+              </button>
+            </div>
+          )}
           <div className="overflow-x-auto">
             <table className="w-full min-w-[720px] border-collapse">
               <thead>
@@ -326,6 +385,7 @@ const Pipeline = () => {
               </tbody>
             </table>
           </div>
+          </>
         )}
       </div>
 

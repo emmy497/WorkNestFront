@@ -593,7 +593,7 @@ const Apply = () => {
         )}
       </div>
 
-      <div className="mt-[22px] flex items-center justify-between gap-4">
+      <div className="mt-[22px] flex flex-wrap items-center justify-between gap-4">
         {step > 0 ? (
           <button
             type="button"
@@ -604,6 +604,14 @@ const Apply = () => {
           </button>
         ) : (
           <span />
+        )}
+
+        {step === 3 && (
+          <p className="order-last w-full font-['Inter'] text-[12px] text-[#8B8798] sm:order-none sm:w-auto sm:flex-1 sm:px-4 sm:text-right">
+            By submitting, you agree to our{" "}
+            <NavLink to="/terms" className="text-[#6D4AFF] underline">Terms</NavLink> and{" "}
+            <NavLink to="/privacy" className="text-[#6D4AFF] underline">Privacy Policy</NavLink>.
+          </p>
         )}
 
         {step < 3 ? (

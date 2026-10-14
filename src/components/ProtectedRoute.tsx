@@ -1,4 +1,4 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import type { ReactNode } from "react";
 import { useAuth } from "../context/AuthContext";
 
@@ -10,6 +10,7 @@ type ProtectedRouteProps = {
 
 const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
   const { isLoggedIn, user, loading, sessionCheckFailed, retrySessionCheck } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -35,7 +36,7 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
       );
     }
 
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" replace state={{ from: location.pathname + location.search }} />;
   }
 
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {

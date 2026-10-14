@@ -257,12 +257,7 @@ const JobDetails = () => {
               >
                 Apply now
               </button>
-              <button
-                type="button"
-                className="mt-[10px] h-[42px] w-full rounded-full bg-[#EFEAFF] font-['Inter'] font-semibold text-[13.5px] text-[#6D4AFF]"
-              >
-                Save for later
-              </button>
+              <SaveJobButton jobId={job.id} jobTitle={job.title} variant="full" />
 
               <div className="mt-[20px] flex flex-col gap-[12px] border-t-[1.07px] border-t-[#F2F1F6] pt-[18px]">
                 {meta.map((row) => (

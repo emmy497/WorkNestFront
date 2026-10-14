@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { toast } from "../../lib/toast";
 import { FiPlus } from "react-icons/fi";
 import type { AdminJobListItem, JobStatus } from "../../types/job";
 import { fetchAdminJobs } from "../../api/adminJobs";
@@ -60,7 +61,33 @@ const Jobs = () => {
   const [error, setError] = useState("");
 
   const [filter, setFilter] = useState<FilterTab>("all");
-  const [search, setSearch] = useState("");
+  const [searchParams] = useSearchParams();
+  const urlQuery = searchParams.get("q") ?? "";
+  const [search, setSearch] = useState(urlQuery);
+  const [lastUrlQuery, setLastUrlQuery] = useState(urlQuery);
+  const [menuJobId, setMenuJobId] = useState<string | null>(null);
+
+  if (urlQuery !== lastUrlQuery) {
+    setLastUrlQuery(urlQuery);
+    setSearch(urlQuery);
+  }
+
+  useEffect(() => {
+    if (!menuJobId) return;
+    const close = () => setMenuJobId(null);
+    document.addEventListener("click", close);
+    return () => document.removeEventListener("click", close);
+  }, [menuJobId]);
+
+  async function copyJobLink(jobId: string) {
+    const url = `${window.location.origin}/job-details/${jobId}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("Link copied");
+    } catch {
+      toast.error("Could not copy the link", url);
+    }
+  }
 
   useEffect(() => {
     fetchAdminJobs()
@@ -236,14 +263,54 @@ const Jobs = () => {
                         {job.status === "draft" ? "Draft" : formatShortRelativeTime(job.createdAt)}
                       </td>
 
-                      <td className="whitespace-nowrap py-[14px] text-right">
+                      <td className="relative whitespace-nowrap py-[14px] text-right">
                         <button
                           type="button"
                           aria-label="More actions"
-                          className="flex size-[30px] items-center justify-center rounded-full text-[#8B8798] hover:bg-[#FAFAFB] hover:text-[#161320]"
+                          aria-haspopup="menu"
+                          aria-expanded={menuJobId === job.id}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMenuJobId((prev) => (prev === job.id ? null : job.id));
+                          }}
+                          className="ml-auto flex size-[30px] items-center justify-center rounded-full text-[#8B8798] hover:bg-[#FAFAFB] hover:text-[#161320]"
                         >
                           ⋮
                         </button>
+                        {menuJobId === job.id && (
+                          <div
+                            role="menu"
+                            className="absolute right-0 top-[calc(100%-6px)] z-20 w-[200px] rounded-[12px] border-[1.07px] border-[#ECEBF0] bg-white p-[6px] text-left shadow-[0px_8px_24px_0px_#1613201A]"
+                          >
+                            <Link
+                              role="menuitem"
+                              to={`/admin/pipeline?job=${job.id}`}
+                              className="block rounded-[8px] px-[10px] py-[8px] font-['Inter'] text-[13px] text-[#161320] hover:bg-[#F7F4FF]"
+                            >
+                              View applicants
+                            </Link>
+                            {job.status === "open" && (
+                              <>
+                                <Link
+                                  role="menuitem"
+                                  to={`/job-details/${job.id}`}
+                                  target="_blank"
+                                  className="block rounded-[8px] px-[10px] py-[8px] font-['Inter'] text-[13px] text-[#161320] hover:bg-[#F7F4FF]"
+                                >
+                                  Open public page
+                                </Link>
+                                <button
+                                  role="menuitem"
+                                  type="button"
+                                  onClick={() => copyJobLink(job.id)}
+                                  className="block w-full rounded-[8px] px-[10px] py-[8px] text-left font-['Inter'] text-[13px] text-[#161320] hover:bg-[#F7F4FF]"
+                                >
+                                  Copy job link
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        )}
                       </td>
                     </tr>
                   );

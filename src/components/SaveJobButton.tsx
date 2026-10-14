@@ -1,5 +1,5 @@
 import { useState, type MouseEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FiBookmark } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
 import { useSavedJobs } from "../context/SavedJobsContext";
@@ -9,7 +9,7 @@ type SaveJobButtonProps = {
   jobId: string;
   jobTitle: string;
 
-  variant?: "plain" | "circle";
+  variant?: "plain" | "circle" | "full";
 };
 
 const SaveJobButton = ({
@@ -20,6 +20,7 @@ const SaveJobButton = ({
   const { isLoggedIn } = useAuth();
   const { isSaved, toggleSave } = useSavedJobs();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [busy, setBusy] = useState(false);
 
@@ -31,7 +32,7 @@ const SaveJobButton = ({
 
     if (!isLoggedIn) {
       toast.info("Log in to save jobs", "Saved roles are kept to your account.");
-      navigate("/login");
+      navigate("/login", { state: { from: location.pathname + location.search } });
       return;
     }
 
@@ -51,6 +52,21 @@ const SaveJobButton = ({
 
   const circleClasses =
     "flex h-[38px] w-[38px] items-center justify-center rounded-full bg-white";
+
+  if (variant === "full") {
+    return (
+      <button
+        type="button"
+        onClick={handleClick}
+        disabled={busy}
+        aria-pressed={saved}
+        className="mt-[10px] flex h-[42px] w-full items-center justify-center gap-[8px] rounded-full bg-[#EFEAFF] font-['Inter'] font-semibold text-[13.5px] text-[#6D4AFF] transition hover:bg-[#E4DCFF] disabled:opacity-60"
+      >
+        <FiBookmark size={15} fill={saved ? "currentColor" : "none"} />
+        {saved ? "Saved" : "Save for later"}
+      </button>
+    );
+  }
 
   return (
     <button

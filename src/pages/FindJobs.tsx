@@ -83,7 +83,7 @@ const FindJobs = () => {
     .sort((a, b) => {
       if (sort === "closing") return a.closesInDays - b.closesInDays;
       if (sort === "salary") return b.salaryMax - a.salaryMax;
-      return 0;
+      return a.postedDaysAgo - b.postedDaysAgo;
     });
 
   return (

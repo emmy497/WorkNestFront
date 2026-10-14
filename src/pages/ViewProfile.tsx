@@ -24,13 +24,28 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-function Field({ label, value }: { label: string; value: string }) {
+function toHref(value: string): string {
+  return /^https?:\/\//i.test(value) ? value : `https://${value}`;
+}
+
+function Field({ label, value, link = false }: { label: string; value: string; link?: boolean }) {
   return (
-    <div>
+    <div className="min-w-0">
       <p className="mb-1 text-[12px] font-medium text-[#8B8798]">{label}</p>
-      <p className={`text-[14px] ${value ? "text-[#161320]" : "italic text-[#B4AFC2]"}`}>
-        {value || "Not added yet"}
-      </p>
+      {value && link ? (
+        <a
+          href={toHref(value)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block truncate text-[14px] text-[#6D4AFF] underline"
+        >
+          {value}
+        </a>
+      ) : (
+        <p className={`text-[14px] ${value ? "text-[#161320]" : "italic text-[#B4AFC2]"}`}>
+          {value || "Not added yet"}
+        </p>
+      )}
     </div>
   );
 }
@@ -140,8 +155,8 @@ const ViewProfile = () => {
               )}
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <Field label="Portfolio link" value={profile.portfolioLink} />
-                <Field label="LinkedIn" value={profile.linkedin} />
+                <Field label="Portfolio link" value={profile.portfolioLink} link />
+                <Field label="LinkedIn" value={profile.linkedin} link />
               </div>
             </ProfileSection>
 

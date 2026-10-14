@@ -1,4 +1,4 @@
-import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import type { ClosingJob } from "../../../types/dashboard";
 import { formatDaysLeft } from "../../../utils/formatShortRelativeTime";
 
@@ -9,6 +9,7 @@ interface JobsClosingSoonProps {
 const SQUARE_COLORS = ["#6D4AFF", "#161320", "#C6531B"];
 
 const JobsClosingSoon = ({ jobs }: JobsClosingSoonProps) => {
+  const navigate = useNavigate();
   return (
     <div className="rounded-[16px] border-[1.07px] border-[#ECEBF0] bg-white p-[22px]">
       <div className="mb-[16px] flex items-center justify-between">
@@ -17,7 +18,7 @@ const JobsClosingSoon = ({ jobs }: JobsClosingSoonProps) => {
         </h2>
         <button
           type="button"
-          onClick={() => toast.info("Coming soon!")}
+          onClick={() => navigate("/admin/jobs")}
           className="font-['Inter'] text-[13px] font-semibold text-[#6D4AFF] hover:underline"
         >
           All jobs →

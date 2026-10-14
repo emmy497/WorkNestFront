@@ -188,19 +188,29 @@ const AdminLayout = () => {
             <FiMenu className="size-[17px]" />
           </button>
 
-          <div className="hidden flex-1 items-center gap-[10px] rounded-full bg-[#FAFAFB] px-[16px] py-[9px] sm:flex">
+          <form
+            role="search"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const q = new FormData(e.currentTarget).get("q")?.toString().trim() ?? "";
+              navigate(q ? `/admin/jobs?q=${encodeURIComponent(q)}` : "/admin/jobs");
+            }}
+            className="hidden flex-1 items-center gap-[10px] rounded-full bg-[#FAFAFB] px-[16px] py-[9px] sm:flex"
+          >
             <FiSearch className="size-[16px] shrink-0 text-[#8B8798]" />
             <input
-              type="text"
-              placeholder="Search jobs, candidates, clients..."
+              type="search"
+              name="q"
+              placeholder="Search jobs by role or client, then press Enter"
               className="w-full min-w-0 bg-transparent font-['Inter'] text-[13.5px] text-[#161320] outline-none placeholder:text-[#8B8798]"
             />
-          </div>
+          </form>
           <div className="flex-1 sm:hidden" />
 
           <button
             type="button"
             aria-label="Notifications"
+            onClick={() => navigate("/admin/notifications")}
             className="flex size-[38px] shrink-0 items-center justify-center rounded-full border-[1.07px] border-[#ECEBF0] text-[#4B4757] hover:bg-[#FAFAFB]"
           >
             <FiBell className="size-[16px]" />

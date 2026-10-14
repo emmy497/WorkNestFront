@@ -15,13 +15,13 @@ const HowSection = () => {
           <div>Cowrywise</div>
           <div>Bumpa</div>
         </div>
-        <div className="flex flex-col lg:flex-row lg:justify-between mb-10 lg:mb-[63px] gap-6 lg:gap-[165px]">
+        <div id="how-it-works" className="scroll-mt-24 flex flex-col lg:flex-row lg:justify-between mb-10 lg:mb-[63px] gap-6 lg:gap-[165px]">
           <div className="font-['Bricolage_Grotesque'] font-bold text-3xl sm:text-4xl lg:text-[46px] leading-tight lg:leading-[47.84px] tracking-tight lg:tracking-[-1.29px] align-middle [leading-trim:none]">
             Three steps. One of them is the reason people stay
           </div>
           <div className="font-['Inter'] font-normal text-base lg:text-[18px] leading-relaxed lg:leading-[28.8px] tracking-normal align-middle [leading-trim:none] text-[#4B4757]">
             Most job sites end when you hit submit. Ours is just getting started
-            because a person on our team picks up your application from there.h
+            because a person on our team picks up your application from there.
           </div>
         </div>
 

@@ -6,7 +6,7 @@ const columns = [
     title: "For candidates",
     links: [
       { label: "Find jobs", to: "/find-jobs" },
-      { label: "How it works", to: "/how-it-works" },
+      { label: "How it works", to: "/#how-it-works" },
       { label: "Create profile", to: "/signup" },
       { label: "Your applications", to: "/applications" },
     ],
@@ -14,17 +14,17 @@ const columns = [
   {
     title: "For companies",
     links: [
-      { label: "Hire through WorkNest", to: "" },
-      { label: "How hiring works", to: "" },
-      { label: "Talk to us", to: "" },
+      { label: "Hire through WorkNest", to: "/for-companies" },
+      { label: "How hiring works", to: "/for-companies#how-hiring-works" },
+      { label: "Talk to us", to: "/for-companies#talk-to-us" },
     ],
   },
   {
     title: "Company",
     links: [
-      { label: "About", to: "" },
-      { label: "Careers", to: "" },
-      { label: "Contact", to: "" },
+      { label: "About", to: "/about" },
+      { label: "Careers", to: "/about#careers" },
+      { label: "Contact", to: "/contact" },
     ],
   },
 ];
@@ -71,11 +71,11 @@ const Footer = () => {
           </div>
 
           <div className="flex items-center gap-[7px] font-['Inter'] font-normal text-[10.5px] leading-[16px] tracking-[1.2px] uppercase text-[hsla(0,0%,100%,0.4)]">
-            <NavLink to="" className="transition hover:text-white">
+            <NavLink to="/privacy" className="transition hover:text-white">
               Privacy
             </NavLink>
             <span aria-hidden="true">·</span>
-            <NavLink to="" className="transition hover:text-white">
+            <NavLink to="/terms" className="transition hover:text-white">
               Terms
             </NavLink>
           </div>
