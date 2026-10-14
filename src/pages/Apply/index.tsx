@@ -9,9 +9,9 @@ import {
   fetchApplicationPrefill,
   checkAlreadyApplied,
   submitApplication,
+  uploadApplicationCv,
   type ApplicationDraft,
 } from "../../api/applications";
-import { uploadMyCv } from "../../api/profile";
 import { toast } from "../../lib/toast";
 import { useAuth } from "../../context/AuthContext";
 import type { Job } from "../../types/job";
@@ -82,6 +82,7 @@ const Apply = () => {
 
   const [submitting, setSubmitting] = useState(false);
   const [uploadingCv, setUploadingCv] = useState(false);
+  const [cvFromProfile, setCvFromProfile] = useState(false);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -156,6 +157,7 @@ const Apply = () => {
           }));
 
           setPrefilled(Boolean(prefill.fullName && prefill.email));
+          setCvFromProfile(Boolean(prefill.cvUrl));
         } else {
           setDraft((prev) => ({
             ...prev,
@@ -190,11 +192,12 @@ const Apply = () => {
     setUploadingCv(true);
 
     try {
-      const profile = await uploadMyCv(file);
+      const uploaded = await uploadApplicationCv(file);
 
-      update("cvUrl", profile.cvUrl);
-      update("cvOriginalName", profile.cvOriginalName);
-      toast.success("CV uploaded", profile.cvOriginalName);
+      update("cvUrl", uploaded.cvUrl);
+      update("cvOriginalName", uploaded.cvOriginalName);
+      setCvFromProfile(false);
+      toast.success("CV uploaded", uploaded.cvOriginalName);
     } catch (err) {
       toast.error(
         "Could not upload that CV",
@@ -352,8 +355,9 @@ const Apply = () => {
               CV &amp; links
             </h1>
             <p className="mt-[6px] font-['Inter'] text-[13.5px] text-[#4B4757]">
-              Confirm what this company will see. Your profile CV is attached by
-              default.
+              {isLoggedIn
+                ? "Confirm what this company will see. Your profile CV is attached by default."
+                : "Upload the CV this company will see, and add any links."}
             </p>
 
             {draft.cvOriginalName ? (
@@ -367,7 +371,7 @@ const Apply = () => {
                     {draft.cvOriginalName}
                   </div>
                   <div className="font-['Inter'] text-[11.5px] text-[#6D4AFF]">
-                    Attached from your profile
+                    {cvFromProfile ? "Attached from your profile" : "Attached to this application"}
                   </div>
                 </div>
 
@@ -377,14 +381,18 @@ const Apply = () => {
               </div>
             ) : (
               <div className="mt-[20px] rounded-[14px] border-[1.07px] border-dashed border-[#ECEBF0] bg-[#FAFAFB] p-[18px] text-center font-['Inter'] text-[13px] text-[#4B4757]">
-                No CV on your profile yet — upload one below.
+                {isLoggedIn
+                  ? "No CV on your profile yet — upload one below."
+                  : "No CV attached yet — upload a PDF or Word file, 5MB max."}
               </div>
             )}
 
             <label className="mt-[12px] inline-block cursor-pointer font-['Inter'] text-[12.5px] text-[#6D4AFF] underline">
               {uploadingCv
                 ? "Uploading…"
-                : "Upload a different CV for this role"}
+                : draft.cvOriginalName
+                  ? "Upload a different CV for this role"
+                  : "Upload your CV"}
               <input
                 type="file"
                 accept=".pdf,.doc,.docx"

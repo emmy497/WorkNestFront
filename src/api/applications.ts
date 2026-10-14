@@ -64,3 +64,16 @@ export async function submitApplication(
     throw new Error(extractError(err, 'Could not submit your application'));
   }
 }
+
+export async function uploadApplicationCv(
+  file: File
+): Promise<{ cvUrl: string; cvOriginalName: string }> {
+  try {
+    const formData = new FormData();
+    formData.append("cv", file);
+    const res = await apiClient.post<{ cvUrl: string; cvOriginalName: string }>('/applications/cv', formData);
+    return res.data;
+  } catch (err) {
+    throw new Error(extractError(err, 'Could not upload your CV'));
+  }
+}
