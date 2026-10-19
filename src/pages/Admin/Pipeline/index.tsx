@@ -65,6 +65,8 @@ const Pipeline = () => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkStatus, setBulkStatus] = useState<ApplicationStatus>("review");
   const [bulkSaving, setBulkSaving] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 10;
 
   useEffect(() => {
     fetchAdminApplications()
@@ -118,10 +120,28 @@ const Pipeline = () => {
     return counts;
   }, [roleApplications]);
 
-  const visibleApplications = useMemo(
+  const filteredApplications = useMemo(
     () => (filter === "all" ? roleApplications : roleApplications.filter((app) => app.status === filter)),
     [roleApplications, filter]
   );
+
+  const totalPages = Math.max(1, Math.ceil(filteredApplications.length / PAGE_SIZE));
+
+  useEffect(() => {
+    setCurrentPage(1);
+    setSelectedIds(new Set());
+  }, [filter, selectedJobId]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  const visibleApplications = useMemo(() => {
+    const startIndex = (currentPage - 1) * PAGE_SIZE;
+    return filteredApplications.slice(startIndex, startIndex + PAGE_SIZE);
+  }, [filteredApplications, currentPage]);
 
   function toggleSelected(id: string) {
     setSelectedIds((prev) => {
@@ -199,6 +219,7 @@ const Pipeline = () => {
                   onClick={() => {
                     setSelectedJobId(role.jobId);
                     setFilter("all");
+                    setCurrentPage(1);
                     setSelectedIds(new Set());
                     setRoleMenuOpen(false);
                   }}
@@ -221,7 +242,10 @@ const Pipeline = () => {
           <button
             key={tab.key}
             type="button"
-            onClick={() => setFilter(tab.key)}
+            onClick={() => {
+              setFilter(tab.key);
+              setCurrentPage(1);
+            }}
             className={`whitespace-nowrap rounded-full px-[14px] py-[8px] font-['Inter'] text-[13px] font-semibold transition-colors ${
               filter === tab.key
                 ? "bg-[#6D4AFF] text-white"
@@ -384,6 +408,35 @@ const Pipeline = () => {
                 })}
               </tbody>
             </table>
+          </div>
+
+          <div className="mt-[18px] flex flex-col gap-[10px] sm:flex-row sm:items-center sm:justify-between">
+            <p className="font-['Inter'] text-[12.5px] text-[#8B8798]">
+              Showing {filteredApplications.length === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1}–
+              {Math.min(currentPage * PAGE_SIZE, filteredApplications.length)} of {filteredApplications.length}
+            </p>
+
+            <div className="flex items-center gap-[8px]">
+              <button
+                type="button"
+                onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+                disabled={currentPage === 1}
+                className="rounded-full border-[1.07px] border-[#ECEBF0] bg-white px-[12px] py-[7px] font-['Inter'] text-[12.5px] font-semibold text-[#4B4757] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <span className="font-['Inter'] text-[12.5px] font-semibold text-[#161320]">
+                Page {currentPage} / {totalPages}
+              </span>
+              <button
+                type="button"
+                onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+                disabled={currentPage === totalPages}
+                className="rounded-full border-[1.07px] border-[#ECEBF0] bg-white px-[12px] py-[7px] font-['Inter'] text-[12.5px] font-semibold text-[#4B4757] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
           </div>
           </>
         )}

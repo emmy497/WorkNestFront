@@ -55,7 +55,7 @@ const SearchBar = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex w-full max-w-[560px] h-auto flex-col gap-3 rounded-2xl bg-white p-4 shadow-lg shadow-violet-100 lg:mt-[24px] lg:h-[60px] lg:flex-row lg:items-center lg:gap-3 lg:rounded-full lg:py-[8px]"
+      className="mx-auto flex h-auto w-full max-w-[560px] flex-col gap-3 rounded-2xl bg-white p-4 shadow-lg shadow-violet-100 lg:mt-[24px] lg:h-[60px] lg:flex-row lg:items-center lg:gap-3 lg:rounded-full lg:py-[8px]"
     >
       <div className="flex items-center w-full gap-3 border-b border-gray-100 lg:w-[312px] lg:border-b-0 lg:pl-[24px]">
         <img src="/images/search.png" alt="" />
